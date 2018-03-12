@@ -70,6 +70,66 @@ namespace ld
 
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            pokerDiceHand p = obj as pokerDiceHand;
+            if ((System.Object)p == null)
+                return false;
+
+            return (faces == p.faces);
+        }
+
+        public bool Equals ( pokerDiceHand obj )
+        {
+            if (ReferenceEquals(obj, null))
+            {
+                return false;
+            }
+            if (obj.faces == faces)
+                return true;
+            return false;
+        }
+
+        public static bool operator == (pokerDiceHand lhs, pokerDiceHand rhs)
+        {
+            if (ReferenceEquals(lhs, null))
+                return true;
+            if (ReferenceEquals(rhs, null))
+                return true;
+            if (ReferenceEquals(lhs, rhs))
+                return true;
+            if (lhs.faces == rhs.faces)
+                return true;
+            return false;
+        }
+
+        public static bool operator !=(pokerDiceHand lhs, pokerDiceHand rhs)
+        {
+            return !(lhs == rhs);
+        }
+
+        public override int GetHashCode()
+        {
+            int hashcode = 0;
+            hashcode += 100000 * acesCount;
+            hashcode += 10000 * kingsCount;
+            hashcode += 1000 * queensCount;
+            hashcode += 100 * jacksCount;
+            hashcode += 10 * tensCount;
+            hashcode += 1 * ninesCount;
+            return hashcode;
+        }
+
         private String faces = "";
+        private int acesCount = 0;
+        private int kingsCount = 0;
+        private int queensCount = 0;
+        private int jacksCount = 0;
+        private int tensCount = 0;
+        private int ninesCount = 0;
+
     }
 }
