@@ -27,10 +27,14 @@ namespace ld
         {
             pokerDiceHand pdha = new pokerDiceHand("AAJJ9");
             pokerDiceHand pdhb = new pokerDiceHand("AJ9AJ");
-            if (pdha == pdhb)
-                return true;
+            if (pdha != pdhb)
+                return false;
 
-            return false;
+            pokerDiceHand pdhc = new pokerDiceHand("AJAAJ");
+            if (pdha == pdhc)
+                return false;
+
+            return true;
         }
     }
 }
