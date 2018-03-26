@@ -13,8 +13,12 @@ namespace ld
         {
             Console.WriteLine("Liar's dice game development...");
 
-            unitTester ut = new unitTester();
-            ut.runAll();
+            permutationsCalculator pc = new permutationsCalculator();
+
+            Console.WriteLine( pc.getPermutationTable());
+
+            //unitTester ut = new unitTester();
+            //ut.runAll();
 
 
             // Keep the console window open in debug mode.

@@ -38,6 +38,13 @@ namespace ld
                 faces += "9";
         }
 
+
+        public string getFacesOrderedByRank()
+        {
+            return faces;
+        }
+
+
         public override bool Equals(object obj)
         {
             if (obj == null)
