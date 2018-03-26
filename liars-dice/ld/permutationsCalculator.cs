@@ -18,10 +18,26 @@ namespace ld
                 tickerArray[j - 1].AddNeighbour(tickerArray[j]);           
             do
             {
-                this.permutationTable += tickerArray[0].GetString() + "\n";
+                pokerDiceHand pdh = new pokerDiceHand(tickerArray[0].GetString());
+                string diceFacesOrderedByRank = pdh.getFacesOrderedByRank();
+                if (duplicatesCountTable.ContainsKey(diceFacesOrderedByRank))
+                {
+                    int oldCount = duplicatesCountTable[diceFacesOrderedByRank];
+                    duplicatesCountTable[diceFacesOrderedByRank] = oldCount + 1;
+                }
+                else
+                {
+                    duplicatesCountTable.Add(diceFacesOrderedByRank, 1);
+                }
                 tickerArray[0].Tick();
             }
             while (tickerArray[diceCount-1].hasOverflowed() == false );
+
+            this.permutationTable = "|";
+            foreach (var pair in duplicatesCountTable)
+            {
+                this.permutationTable += pair.ToString() + "|";
+            }
         }
 
         public string getPermutationTable()
@@ -30,6 +46,8 @@ namespace ld
         }
 
         string permutationTable = "";
+        SortedDictionary<string, int> duplicatesCountTable =
+            new SortedDictionary<string, int>();
 
 
         private class diceFaceTicker
