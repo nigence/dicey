@@ -33,6 +33,7 @@ namespace ld
             }
             while (tickerArray[diceCount-1].hasOverflowed() == false );
 
+            int debugNumberEntriesInDuplicatesCountTable = duplicatesCountTable.Count;
             this.permutationTable = "|";
             foreach (var pair in duplicatesCountTable)
             {
