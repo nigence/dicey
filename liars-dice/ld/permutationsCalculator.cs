@@ -89,9 +89,7 @@ namespace ld
                     case 'A':
                         { face = '9';
                             if(this.neighbour != null)
-                            {
                                 this.neighbour.Tick();
-                            }
                             overflowed = true;
                             break;
                         }

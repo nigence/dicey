@@ -60,9 +60,8 @@ namespace ld
         public bool Equals ( pokerDiceHand obj )
         {
             if (ReferenceEquals(obj, null))
-            {
                 return false;
-            }
+
             if (obj.faces == faces)
                 return true;
             return false;
