@@ -20,6 +20,7 @@ namespace ld
             {
                 if (!PokerDiceHandEqualityOperatorTestPassed()) break;
                 if (!permutationsCalculatorTestPassed()) break;
+                if (!handKindsIdentifyTestPassed()) break;
                 if (!PokerDiceHandGreaterLessThanOperatorsTestPassed()) break;
                 allOkay = true;
             }
@@ -41,6 +42,14 @@ namespace ld
             if (pdha == pdhc)
                 return false;
 
+            return true;
+        }
+
+        private bool handKindsIdentifyTestPassed()
+        {
+            pokerDiceHand pdh = new pokerDiceHand("AAAAA");
+            if (pdh.getHandKind() != pokerDiceHand.HandKind.fiveOfKind)
+                return false;
             return true;
         }
 

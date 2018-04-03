@@ -1,41 +1,43 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ld
 {
     public class pokerDiceHand
     {
-        private void countFaces(String fiveFacesString, string faceKind, ref int counterToIncrement )
+
+        public pokerDiceHand(String fiveFacesString)
         {
-            int faceVal = System.Char.ConvertToUtf32( faceKind, 0 );
-            counterToIncrement = 0;
-            for (int i = 0; i < 5; i++)
+            indexToFace.Add(0, "9");
+            indexToFace.Add(1, "T");
+            indexToFace.Add(2, "J");
+            indexToFace.Add(3, "Q");
+            indexToFace.Add(4, "K");
+            indexToFace.Add(5, "A");
+            faceToIndex.Add("9", 0);
+            faceToIndex.Add("T", 1);
+            faceToIndex.Add("J", 2);
+            faceToIndex.Add("Q", 3);
+            faceToIndex.Add("K", 4);
+            faceToIndex.Add("A", 5);
+
+            int[] facesCounts = new int[indexToFace.Count];
+
+            for (int j=indexToFace.Count-1; j>-1; j--)
             {
-                if (fiveFacesString[i] == faceVal)
-                    counterToIncrement++;
+                countFaces(fiveFacesString, indexToFace[j], ref facesCounts[j]);
+
+                for (int i = 0; i < facesCounts[j]; i++)
+                    faces += indexToFace[j];
             }
+
+            SetHashCode(facesCounts);
+            SetHandKind(facesCounts);
         }
 
-        public pokerDiceHand( String fiveFacesString )
+        public HandKind getHandKind()
         {
-            countFaces(fiveFacesString, "A", ref acesCount);
-            countFaces(fiveFacesString, "K", ref kingsCount);
-            countFaces(fiveFacesString, "Q", ref queensCount);
-            countFaces(fiveFacesString, "J", ref jacksCount);
-            countFaces(fiveFacesString, "T", ref tensCount);
-            countFaces(fiveFacesString, "9", ref ninesCount);
-
-            for (int i = 0; i < acesCount; i++)
-                faces += "A";
-            for (int i = 0; i < kingsCount; i++)
-                faces += "K";
-            for (int i = 0; i < queensCount; i++)
-                faces += "Q";
-            for (int i = 0; i < jacksCount; i++)
-                faces += "J";
-            for (int i = 0; i < tensCount; i++)
-                faces += "T";
-            for (int i = 0; i < ninesCount; i++)
-                faces += "9";
+            return handKind;
         }
 
 
@@ -97,23 +99,49 @@ namespace ld
 
         public override int GetHashCode()
         {
-            int hashcode = 0;
-            hashcode += 100000 * acesCount;
-            hashcode += 10000 * kingsCount;
-            hashcode += 1000 * queensCount;
-            hashcode += 100 * jacksCount;
-            hashcode += 10 * tensCount;
-            hashcode += 1 * ninesCount;
             return hashcode;
         }
 
-        private String faces = "";
-        private int acesCount = 0;
-        private int kingsCount = 0;
-        private int queensCount = 0;
-        private int jacksCount = 0;
-        private int tensCount = 0;
-        private int ninesCount = 0;
+        private void SetHashCode( int[] facesCounts)
+        {
+            hashcode = 0;
+            int multiplier = 1;
 
+            for (int i=0; i<facesCounts.Length; i++)
+            {
+                hashcode += multiplier * facesCounts[i];
+                multiplier *= 10;
+            }
+        }
+
+        public enum HandKind { fiveOfKind, fourOfKind, fullHouse, straight, threeOfKind, twoPairs, pair, none };
+
+        private void countFaces(String fiveFacesString, string faceKind, ref int counterToIncrement)
+        {
+            int faceVal = System.Char.ConvertToUtf32(faceKind, 0);
+            counterToIncrement = 0;
+            for (int i = 0; i < 5; i++)
+            {
+                if (fiveFacesString[i] == faceVal)
+                    counterToIncrement++;
+            }
+        }
+
+        private void SetHandKind(int[] facesCounts)
+        {
+            for (int i = 0; i < facesCounts.Length; i++)
+            {
+
+
+            }
+            handKind = HandKind.none;
+        }
+
+        private HandKind handKind;
+        private int hashcode;
+        private String faces = "";
+
+        private Dictionary<int, string> indexToFace = new Dictionary<int, string>();
+        private Dictionary<string, int> faceToIndex = new Dictionary<string, int>();
     }
 }
