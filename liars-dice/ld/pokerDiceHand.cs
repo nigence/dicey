@@ -85,6 +85,16 @@ namespace ld
             return !(lhs == rhs);
         }
 
+        public static bool operator > (pokerDiceHand lhs, pokerDiceHand rhs)
+        {
+            return false;
+        }
+
+        public static bool operator < (pokerDiceHand lhs, pokerDiceHand rhs)
+        {
+            return false;
+        }
+
         public override int GetHashCode()
         {
             int hashcode = 0;

@@ -20,6 +20,7 @@ namespace ld
             {
                 if (!PokerDiceHandEqualityOperatorTestPassed()) break;
                 if (!permutationsCalculatorTestPassed()) break;
+                if (!PokerDiceHandGreaterLessThanOperatorsTestPassed()) break;
                 allOkay = true;
             }
             if(!allOkay)
@@ -43,6 +44,41 @@ namespace ld
             return true;
         }
 
+        private bool PokerDiceHandGreaterLessThanOperatorsTestPassed()
+        {
+            int size = handRankArray.Length;
+            // Console.WriteLine("......handRankArray.Length() is {0}", size); //This MUST be 252
+            bool testFailSeen = false;
+            for (int i = 0; i<size; i++)
+            {
+                for (int j = 0; j<size; j++)
+                {
+                    pokerDiceHand a = handRankArray[i];
+                    pokerDiceHand b = handRankArray[j];
+                    if (i == j && !(a == b))
+                        testFailSeen = true;
+                    if (i > j && !(a < b))
+                        testFailSeen = true;
+                    if (i < j && !(a > b))
+                        testFailSeen = true;
+                    if (i > j && (a > b))
+                        testFailSeen = true;
+                    if (i < j && (a < b))
+                        testFailSeen = true;
+                    if (testFailSeen)
+                    {
+                        string debugStr = "PokerDiceHandGreaterLessThanOperatorsTestPassed() FAIL with ";
+                        debugStr += a.getFacesOrderedByRank();
+                        debugStr += " and ";
+                        debugStr += b.getFacesOrderedByRank();
+                        Console.WriteLine(debugStr);
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         private bool permutationsCalculatorTestPassed()
         {
             string expectedPermutationsTable
@@ -53,261 +89,260 @@ namespace ld
             return (pt == expectedPermutationsTable);
         }
 
-        /*
-HAND RANK TEST DATA
----- ---- ---- ----
-6		[AAAAA, 1]-- FIVE OF A KIND
-167		[KKKKK, 1]
-237		[QQQQQ, 1]
-132		[JJJJJ, 1]
-252		[TTTTT, 1]
-1		[99999, 1]
-8		[AAAAK, 5]-- FOUR OF A KIND
-9		[AAAAQ, 5]
-7 		[AAAAJ, 5]
-10		[AAAAT, 5]
-5		[AAAA9, 5]
-82		[AKKKK, 5]
-168		[KKKKQ, 5]
-166		[KKKKJ, 5]
-169		[KKKKT, 5]
-165		[KKKK9, 5]
-117		[AQQQQ, 5]
-202		[KQQQQ, 5]
-236		[QQQQJ, 5]
-238		[QQQQT, 5]
-235		[QQQQ9, 5]
-62		[AJJJJ, 5]
-147		[KJJJJ, 5]
-217		[QJJJJ, 5]
-133		[JJJJT, 5]
-131		[JJJJ9, 5]
-127		[ATTTT, 5]
-212		[KTTTT, 5]
-247		[QTTTT, 5]
-142		[JTTTT, 5]
-251		[TTTT9, 5]
-2		[A9999, 5]
-143		[K9999, 5]
-213		[Q9999, 5]
-128		[J9999, 5]
-248		[T9999, 5]
-16		[AAAKK, 10] -- FULL HOUSE
-21		[AAAQQ, 10]
-12		[AAAJJ, 10]
-24		[AAATT, 10]
-4		[AAA99, 10]
-37		[AAKKK, 10]
-172		[KKKQQ, 10]
-163		[KKKJJ, 10]
-175		[KKKTT, 10]
-161		[KKK99, 10]
-52		[AAQQQ, 10]
-182		[KKQQQ, 10]
-233		[QQQJJ, 10]
-240		[QQQTT, 10]
-231		[QQQ99, 10]
-27		[AAJJJ, 10]
-157		[KKJJJ, 10]
-227		[QQJJJ, 10]
-135		[JJJTT, 10]
-130		[JJJ99, 10]
-58		[AATTT, 10]
-188		[KKTTT, 10]
-243		[QQTTT, 10]
-138		[JJTTT, 10]
-250		[TTT99, 10]
-3		[AA999, 10]
-154		[KK999, 10]
-224		[QQ999, 10]
-129		[JJ999, 10]
-249		[TT999, 10]
-94		[AKQJT, 120] -- STRAIGHT
-194		[KQJT9, 120]
-17		[AAAKQ, 20] -- THREE OF A KIND
-15		[AAAKJ, 20]
-18		[AAAKT, 20]
-14		[AAAK9, 20]
-20		[AAAQJ, 20]
-22		[AAAQT, 20]
-19		[AAAQ9, 20]
-13		[AAAJT, 20]
-11		[AAAJ9, 20]
-23		[AAAT9, 20]
-83		[AKKKQ, 20]
-81		[AKKKJ, 20]
-84		[AKKKT, 20]
-80		[AKKK9, 20]
-171		[KKKQJ, 20]
-173		[KKKQT, 20]
-170		[KKKQ9, 20]
-164		[KKKJT, 20]
-162		[KKKJ9, 20]
-174		[KKKT9, 20]
-xxx		[AKQQQ, 20]
-116		[AQQQJ, 20]
-118		[AQQQT, 20]
-115		[AQQQ9, 20]
-201		[KQQQJ, 20]
-203		[KQQQT, 20]
-200		[KQQQ9, 20]
-234		[QQQJT, 20]
-232		[QQQJ9, 20]
-239		[QQQT9, 20]
-72		[AKJJJ, 20]
-107		[AQJJJ, 20]
-63		[AJJJT, 20]
-61		[AJJJ9, 20]
-192		[KQJJJ, 20]
-148		[KJJJT, 20]
-146		[KJJJ9, 20]
-218		[QJJJT, 20]
-216		[QJJJ9, 20]
-134		[JJJT9, 20]
-xxx		[AKTTT, 20]
-123		[AQTTT, 20]
-68		[AJTTT, 20]
-126		[ATTT9, 20]
-208		[KQTTT, 20]
-153		[KJTTT, 20]
-211		[KTTT9, 20]
-223		[QJTTT, 20]
-246		[QTTT9, 20]
-141		[JTTT9, 20]
-69		[AK999, 20]
-xxx		[AQ999, 20]
-59		[AJ999, 20]
-124		[AT999, 20]
-189		[KQ999, 20]
-144		[KJ999, 20]
-209		[KT999, 20]
-214		[QJ999, 20]
-244		[QT999, 20]
-139		[JT999, 20]
-38		[AAKKQ, 30] -- TWO PAIRS
-36		[AAKKJ, 30]
-39		[AAKKT, 30]
-35		[AAKK9, 30]
-42		[AAKQQ, 30]
-51		[AAQQJ, 30]
-53		[AAQQT, 30]
-50		[AAQQ9, 30]
-33		[AAKJJ, 30]
-48		[AAQJJ, 30]
-28		[AAJJT, 30]
-26		[AAJJ9, 30]
-45		[AAKTT, 30]
-55		[AAQTT, 30]
-30		[AAJTT, 30]
-57		[AATT9, 30]
-31		[AAK99, 30]
-46		[AAQ99, 30]
-25		[AAJ99, 30]
-56		[AAT99, 30]
-87		[AKKQQ, 30]
-181		[KKQQJ, 30]
-183		[KKQQT, 30]
-180		[KKQQ9, 30]
-78		[AKKJJ, 30]
-178		[KKQJJ, 30]
-158		[KKJJT, 30]
-156		[KKJJ9, 30]
-90		[AKKTT, 30]
-185		[KKQTT, 30]
-160		[KKJTT, 30]
-187		[KKTT9, 30]
-76		[AKK99, 30]
-176		[KKQ99, 30]
-155		[KKJ99, 30]
-186		[KKT99, 30]
-113		[AQQJJ, 30]
-198		[KQQJJ, 30]
-228		[QQJJT, 30]
-226		[QQJJ9, 30]
-120		[AQQTT, 30]
-205		[KQQTT, 30]
-230		[QQJTT, 30]
-242		[QQTT9, 30]
-111		[AQQ99, 30]
-196		[KQQ99, 30]
-225		[QQJ99, 30]
-241		[QQT99, 30]
-65		[AJJTT, 30]
-150		[KJJTT, 30]
-220		[QJJTT, 30]
-137		[JJTT9, 30]
-60		[AJJ99, 30]
-145		[KJJ99, 30]
-215		[QJJ99, 30]
-136		[JJT99, 30]
-125		[ATT99, 30]
-210		[KTT99, 30]
-245		[QTT99, 30]
-140		[JTT99, 30]
-41		[AAKQJ, 60] -- PAIR
-43		[AAKQT, 60]
-40		[AAKQ9, 60]
-34		[AAKJT, 60]
-32		[AAKJ9, 60]
-44		[AAKT9, 60]
-49		[AAQJT, 60]
-47		[AAQJ9, 60]
-54		[AAQT9, 60]
-29		[AAJT9, 60]
-86		[AKKQJ, 60]
-88		[AKKQT, 60]
-85		[AKKQ9, 60]
-79		[AKKJT, 60]
-77		[AKKJ9, 60]
-89		[AKKT9, 60]
-179		[KKQJT, 60]
-177		[KKQJ9, 60]
-184		[KKQT9, 60]
-159		[KKJT9, 60]
-96		[AKQQJ, 60]
-98		[AKQQT, 60]
-95		[AKQQ9, 60]
-114		[AQQJT, 60]
-112		[AQQJ9, 60]
-119		[AQQT9, 60]
-199		[KQQJT, 60]
-197		[KQQJ9, 60]
-204		[KQQT9, 60]
-229		[QQJT9, 60]
-93		[AKQJJ, 60]
-73		[AKJJT, 60]
-71		[AKJJ9, 60]
-108		[AQJJT, 60]
-106		[AQJJ9, 60]
-64		[AJJT9, 60]
-193		[KQJJT, 60]
-191		[KQJJ9, 60]
-149		[KJJT9, 60]
-219		[QJJT9, 60]
-100		[AKQTT, 60]
-75		[AKJTT, 60]
-102		[AKTT9, 60]
-110		[AQJTT, 60]
-122		[AQTT9, 60]
-67		[AJTT9, 60]
-195		[KQJTT, 60]
-207		[KQTT9, 60]
-152		[KJTT9, 60]
-222		[QJTT9, 60]
-91		[AKQ99, 60]
-70		[AKJ99, 60]
-101		[AKT99, 60]
-105		[AQJ99, 60]
-121		[AQT99, 60]
-66		[AJT99, 60]
-190		[KQJ99, 60]
-206		[KQT99, 60]
-151		[KJT99, 60]
-221		[QJT99, 60]
-92		[AKQJ9, 120] --ACE HIGH
-99		[AKQT9, 120]
-74		[AKJT9, 120]
-109		[AQJT9, 120]
-        */
+        private pokerDiceHand[] handRankArray = {
+
+        new pokerDiceHand("AAAAA"), // 1 permutations -- FIVE OF A KIND
+		new pokerDiceHand("KKKKK"), // 1 permutations 
+		new pokerDiceHand("QQQQQ"), // 1 permutations 
+		new pokerDiceHand("JJJJJ"), // 1 permutations
+		new pokerDiceHand("TTTTT"), // 1 permutations
+		new pokerDiceHand("99999"), // 1 permutations
+		new pokerDiceHand("AAAAK"), // 5 permutations -- FOUR OF A KIND
+		new pokerDiceHand("AAAAQ"), // 5 permutations 
+		new pokerDiceHand("AAAAJ"), // 5 permutations 
+		new pokerDiceHand("AAAAT"), // 5 permutations 
+		new pokerDiceHand("AAAA9"), // 5 permutations 
+		new pokerDiceHand("AKKKK"), // 5 permutations 
+		new pokerDiceHand("KKKKQ"), // 5 permutations 
+		new pokerDiceHand("KKKKJ"), // 5 permutations 
+		new pokerDiceHand("KKKKT"), // 5 permutations 
+		new pokerDiceHand("KKKK9"), // 5 permutations 
+		new pokerDiceHand("AQQQQ"), // 5 permutations 
+		new pokerDiceHand("KQQQQ"), // 5 permutations 
+		new pokerDiceHand("QQQQJ"), // 5 permutations 
+		new pokerDiceHand("QQQQT"), // 5 permutations 
+		new pokerDiceHand("QQQQ9"), // 5 permutations 
+		new pokerDiceHand("AJJJJ"), // 5 permutations 
+		new pokerDiceHand("KJJJJ"), // 5 permutations 
+		new pokerDiceHand("QJJJJ"), // 5 permutations 
+		new pokerDiceHand("JJJJT"), // 5 permutations 
+		new pokerDiceHand("JJJJ9"), // 5 permutations 
+		new pokerDiceHand("ATTTT"), // 5 permutations 
+		new pokerDiceHand("KTTTT"), // 5 permutations 
+		new pokerDiceHand("QTTTT"), // 5 permutations 
+		new pokerDiceHand("JTTTT"), // 5 permutations 
+		new pokerDiceHand("TTTT9"), // 5 permutations 
+		new pokerDiceHand("A9999"), // 5 permutations 
+		new pokerDiceHand("K9999"), // 5 permutations 
+		new pokerDiceHand("Q9999"), // 5 permutations 
+		new pokerDiceHand("J9999"), // 5 permutations 
+		new pokerDiceHand("T9999"), // 5 permutations 
+		new pokerDiceHand("AAAKK"), // 10 permutations  -- FULL HOUSE
+		new pokerDiceHand("AAAQQ"), // 10 permutations 
+		new pokerDiceHand("AAAJJ"), // 10 permutations 
+		new pokerDiceHand("AAATT"), // 10 permutations 
+		new pokerDiceHand("AAA99"), // 10 permutations 
+		new pokerDiceHand("AAKKK"), // 10 permutations 
+		new pokerDiceHand("KKKQQ"), // 10 permutations 
+		new pokerDiceHand("KKKJJ"), // 10 permutations 
+		new pokerDiceHand("KKKTT"), // 10 permutations 
+		new pokerDiceHand("KKK99"), // 10 permutations 
+		new pokerDiceHand("AAQQQ"), // 10 permutations 
+		new pokerDiceHand("KKQQQ"), // 10 permutations 
+		new pokerDiceHand("QQQJJ"), // 10 permutations 
+		new pokerDiceHand("QQQTT"), // 10 permutations 
+		new pokerDiceHand("QQQ99"), // 10 permutations 
+		new pokerDiceHand("AAJJJ"), // 10 permutations 
+		new pokerDiceHand("KKJJJ"), // 10 permutations 
+		new pokerDiceHand("QQJJJ"), // 10 permutations 
+		new pokerDiceHand("JJJTT"), // 10 permutations 
+		new pokerDiceHand("JJJ99"), // 10 permutations 
+		new pokerDiceHand("AATTT"), // 10 permutations 
+		new pokerDiceHand("KKTTT"), // 10 permutations 
+		new pokerDiceHand("QQTTT"), // 10 permutations 
+		new pokerDiceHand("JJTTT"), // 10 permutations 
+		new pokerDiceHand("TTT99"), // 10 permutations 
+		new pokerDiceHand("AA999"), // 10 permutations 
+		new pokerDiceHand("KK999"), // 10 permutations 
+		new pokerDiceHand("QQ999"), // 10 permutations 
+		new pokerDiceHand("JJ999"), // 10 permutations 
+		new pokerDiceHand("TT999"), // 10 permutations 
+		new pokerDiceHand("AKQJT"), // 120 permutations  -- STRAIGHT
+		new pokerDiceHand("KQJT9"), // 120 permutations 
+		new pokerDiceHand("AAAKQ"), // 20 permutations  -- THREE OF A KIND
+		new pokerDiceHand("AAAKJ"), // 20 permutations 
+		new pokerDiceHand("AAAKT"), // 20 permutations 
+		new pokerDiceHand("AAAK9"), // 20 permutations 
+		new pokerDiceHand("AAAQJ"), // 20 permutations 
+		new pokerDiceHand("AAAQT"), // 20 permutations 
+		new pokerDiceHand("AAAQ9"), // 20 permutations 
+		new pokerDiceHand("AAAJT"), // 20 permutations 
+		new pokerDiceHand("AAAJ9"), // 20 permutations 
+		new pokerDiceHand("AAAT9"), // 20 permutations 
+		new pokerDiceHand("AKKKQ"), // 20 permutations 
+		new pokerDiceHand("AKKKJ"), // 20 permutations 
+		new pokerDiceHand("AKKKT"), // 20 permutations 
+		new pokerDiceHand("AKKK9"), // 20 permutations 
+		new pokerDiceHand("KKKQJ"), // 20 permutations 
+		new pokerDiceHand("KKKQT"), // 20 permutations 
+		new pokerDiceHand("KKKQ9"), // 20 permutations 
+		new pokerDiceHand("KKKJT"), // 20 permutations 
+		new pokerDiceHand("KKKJ9"), // 20 permutations 
+		new pokerDiceHand("KKKT9"), // 20 permutations 
+		new pokerDiceHand("AKQQQ"), // 20 permutations 
+		new pokerDiceHand("AQQQJ"), // 20 permutations 
+		new pokerDiceHand("AQQQT"), // 20 permutations 
+		new pokerDiceHand("AQQQ9"), // 20 permutations 
+		new pokerDiceHand("KQQQJ"), // 20 permutations 
+		new pokerDiceHand("KQQQT"), // 20 permutations 
+		new pokerDiceHand("KQQQ9"), // 20 permutations 
+		new pokerDiceHand("QQQJT"), // 20 permutations 
+		new pokerDiceHand("QQQJ9"), // 20 permutations 
+		new pokerDiceHand("QQQT9"), // 20 permutations 
+		new pokerDiceHand("AKJJJ"), // 20 permutations 
+		new pokerDiceHand("AQJJJ"), // 20 permutations 
+		new pokerDiceHand("AJJJT"), // 20 permutations 
+		new pokerDiceHand("AJJJ9"), // 20 permutations 
+		new pokerDiceHand("KQJJJ"), // 20 permutations 
+		new pokerDiceHand("KJJJT"), // 20 permutations 
+		new pokerDiceHand("KJJJ9"), // 20 permutations 
+		new pokerDiceHand("QJJJT"), // 20 permutations 
+		new pokerDiceHand("QJJJ9"), // 20 permutations 
+		new pokerDiceHand("JJJT9"), // 20 permutations 
+		new pokerDiceHand("AKTTT"), // 20 permutations 
+		new pokerDiceHand("AQTTT"), // 20 permutations 
+		new pokerDiceHand("AJTTT"), // 20 permutations 
+		new pokerDiceHand("ATTT9"), // 20 permutations 
+		new pokerDiceHand("KQTTT"), // 20 permutations 
+		new pokerDiceHand("KJTTT"), // 20 permutations 
+		new pokerDiceHand("KTTT9"), // 20 permutations 
+		new pokerDiceHand("QJTTT"), // 20 permutations 
+		new pokerDiceHand("QTTT9"), // 20 permutations 
+		new pokerDiceHand("JTTT9"), // 20 permutations 
+		new pokerDiceHand("AK999"), // 20 permutations 
+		new pokerDiceHand("AQ999"), // 20 permutations 
+		new pokerDiceHand("AJ999"), // 20 permutations 
+		new pokerDiceHand("AT999"), // 20 permutations 
+		new pokerDiceHand("KQ999"), // 20 permutations 
+		new pokerDiceHand("KJ999"), // 20 permutations 
+		new pokerDiceHand("KT999"), // 20 permutations 
+		new pokerDiceHand("QJ999"), // 20 permutations 
+		new pokerDiceHand("QT999"), // 20 permutations 
+		new pokerDiceHand("JT999"), // 20 permutations 
+		new pokerDiceHand("AAKKQ"), // 30 permutations  -- TWO PAIRS
+		new pokerDiceHand("AAKKJ"), // 30 permutations 
+		new pokerDiceHand("AAKKT"), // 30 permutations 
+		new pokerDiceHand("AAKK9"), // 30 permutations 
+		new pokerDiceHand("AAKQQ"), // 30 permutations 
+		new pokerDiceHand("AAQQJ"), // 30 permutations 
+		new pokerDiceHand("AAQQT"), // 30 permutations 
+		new pokerDiceHand("AAQQ9"), // 30 permutations 
+		new pokerDiceHand("AAKJJ"), // 30 permutations 
+		new pokerDiceHand("AAQJJ"), // 30 permutations 
+		new pokerDiceHand("AAJJT"), // 30 permutations 
+		new pokerDiceHand("AAJJ9"), // 30 permutations 
+		new pokerDiceHand("AAKTT"), // 30 permutations 
+		new pokerDiceHand("AAQTT"), // 30 permutations 
+		new pokerDiceHand("AAJTT"), // 30 permutations 
+		new pokerDiceHand("AATT9"), // 30 permutations 
+		new pokerDiceHand("AAK99"), // 30 permutations 
+		new pokerDiceHand("AAQ99"), // 30 permutations 
+		new pokerDiceHand("AAJ99"), // 30 permutations 
+		new pokerDiceHand("AAT99"), // 30 permutations 
+		new pokerDiceHand("AKKQQ"), // 30 permutations 
+		new pokerDiceHand("KKQQJ"), // 30 permutations 
+		new pokerDiceHand("KKQQT"), // 30 permutations 
+		new pokerDiceHand("KKQQ9"), // 30 permutations 
+		new pokerDiceHand("AKKJJ"), // 30 permutations 
+		new pokerDiceHand("KKQJJ"), // 30 permutations 
+		new pokerDiceHand("KKJJT"), // 30 permutations 
+		new pokerDiceHand("KKJJ9"), // 30 permutations 
+		new pokerDiceHand("AKKTT"), // 30 permutations 
+		new pokerDiceHand("KKQTT"), // 30 permutations 
+		new pokerDiceHand("KKJTT"), // 30 permutations 
+		new pokerDiceHand("KKTT9"), // 30 permutations 
+		new pokerDiceHand("AKK99"), // 30 permutations 
+		new pokerDiceHand("KKQ99"), // 30 permutations 
+		new pokerDiceHand("KKJ99"), // 30 permutations 
+		new pokerDiceHand("KKT99"), // 30 permutations 
+		new pokerDiceHand("AQQJJ"), // 30 permutations 
+		new pokerDiceHand("KQQJJ"), // 30 permutations 
+		new pokerDiceHand("QQJJT"), // 30 permutations 
+		new pokerDiceHand("QQJJ9"), // 30 permutations 
+		new pokerDiceHand("AQQTT"), // 30 permutations 
+		new pokerDiceHand("KQQTT"), // 30 permutations 
+		new pokerDiceHand("QQJTT"), // 30 permutations 
+		new pokerDiceHand("QQTT9"), // 30 permutations 
+		new pokerDiceHand("AQQ99"), // 30 permutations 
+		new pokerDiceHand("KQQ99"), // 30 permutations 
+		new pokerDiceHand("QQJ99"), // 30 permutations 
+		new pokerDiceHand("QQT99"), // 30 permutations 
+		new pokerDiceHand("AJJTT"), // 30 permutations 
+		new pokerDiceHand("KJJTT"), // 30 permutations 
+		new pokerDiceHand("QJJTT"), // 30 permutations 
+		new pokerDiceHand("JJTT9"), // 30 permutations 
+		new pokerDiceHand("AJJ99"), // 30 permutations 
+		new pokerDiceHand("KJJ99"), // 30 permutations 
+		new pokerDiceHand("QJJ99"), // 30 permutations 
+		new pokerDiceHand("JJT99"), // 30 permutations 
+		new pokerDiceHand("ATT99"), // 30 permutations 
+		new pokerDiceHand("KTT99"), // 30 permutations 
+		new pokerDiceHand("QTT99"), // 30 permutations 
+		new pokerDiceHand("JTT99"), // 30 permutations 
+		new pokerDiceHand("AAKQJ"), // 60 permutations  -- PAIR
+		new pokerDiceHand("AAKQT"), // 60 permutations 
+		new pokerDiceHand("AAKQ9"), // 60 permutations 
+		new pokerDiceHand("AAKJT"), // 60 permutations 
+		new pokerDiceHand("AAKJ9"), // 60 permutations 
+		new pokerDiceHand("AAKT9"), // 60 permutations 
+		new pokerDiceHand("AAQJT"), // 60 permutations 
+		new pokerDiceHand("AAQJ9"), // 60 permutations 
+		new pokerDiceHand("AAQT9"), // 60 permutations 
+		new pokerDiceHand("AAJT9"), // 60 permutations 
+		new pokerDiceHand("AKKQJ"), // 60 permutations 
+		new pokerDiceHand("AKKQT"), // 60 permutations 
+		new pokerDiceHand("AKKQ9"), // 60 permutations 
+		new pokerDiceHand("AKKJT"), // 60 permutations 
+		new pokerDiceHand("AKKJ9"), // 60 permutations 
+		new pokerDiceHand("AKKT9"), // 60 permutations 
+		new pokerDiceHand("KKQJT"), // 60 permutations 
+		new pokerDiceHand("KKQJ9"), // 60 permutations 
+		new pokerDiceHand("KKQT9"), // 60 permutations 
+		new pokerDiceHand("KKJT9"), // 60 permutations 
+		new pokerDiceHand("AKQQJ"), // 60 permutations 
+		new pokerDiceHand("AKQQT"), // 60 permutations 
+		new pokerDiceHand("AKQQ9"), // 60 permutations 
+		new pokerDiceHand("AQQJT"), // 60 permutations 
+		new pokerDiceHand("AQQJ9"), // 60 permutations 
+		new pokerDiceHand("AQQT9"), // 60 permutations 
+		new pokerDiceHand("KQQJT"), // 60 permutations 
+		new pokerDiceHand("KQQJ9"), // 60 permutations 
+		new pokerDiceHand("KQQT9"), // 60 permutations 
+		new pokerDiceHand("QQJT9"), // 60 permutations 
+		new pokerDiceHand("AKQJJ"), // 60 permutations 
+		new pokerDiceHand("AKJJT"), // 60 permutations 
+		new pokerDiceHand("AKJJ9"), // 60 permutations 
+		new pokerDiceHand("AQJJT"), // 60 permutations 
+		new pokerDiceHand("AQJJ9"), // 60 permutations 
+		new pokerDiceHand("AJJT9"), // 60 permutations 
+		new pokerDiceHand("KQJJT"), // 60 permutations 
+		new pokerDiceHand("KQJJ9"), // 60 permutations 
+		new pokerDiceHand("KJJT9"), // 60 permutations 
+		new pokerDiceHand("QJJT9"), // 60 permutations 
+		new pokerDiceHand("AKQTT"), // 60 permutations 
+		new pokerDiceHand("AKJTT"), // 60 permutations 
+		new pokerDiceHand("AKTT9"), // 60 permutations 
+		new pokerDiceHand("AQJTT"), // 60 permutations 
+		new pokerDiceHand("AQTT9"), // 60 permutations 
+		new pokerDiceHand("AJTT9"), // 60 permutations 
+		new pokerDiceHand("KQJTT"), // 60 permutations 
+		new pokerDiceHand("KQTT9"), // 60 permutations 
+		new pokerDiceHand("KJTT9"), // 60 permutations 
+		new pokerDiceHand("QJTT9"), // 60 permutations 
+		new pokerDiceHand("AKQ99"), // 60 permutations 
+		new pokerDiceHand("AKJ99"), // 60 permutations 
+		new pokerDiceHand("AKT99"), // 60 permutations 
+		new pokerDiceHand("AQJ99"), // 60 permutations 
+		new pokerDiceHand("AQT99"), // 60 permutations 
+		new pokerDiceHand("AJT99"), // 60 permutations 
+		new pokerDiceHand("KQJ99"), // 60 permutations 
+		new pokerDiceHand("KQT99"), // 60 permutations 
+		new pokerDiceHand("KJT99"), // 60 permutations 
+		new pokerDiceHand("QJT99"), // 60 permutations 
+		new pokerDiceHand("AKQJ9"), // 120 permutations  --ACE HIGH
+		new pokerDiceHand("AKQT9"), // 120 permutations 
+		new pokerDiceHand("AKJT9"), // 120 permutations 
+		new pokerDiceHand("AQJT9"), // 120 permutations 
+        };
     }
 }
