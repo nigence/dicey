@@ -97,8 +97,6 @@ namespace ld
                     return lhs.primaryFace > rhs.primaryFace;
                 if (lhs.secondaryFace != rhs.secondaryFace)
                     return lhs.secondaryFace > rhs.secondaryFace;
-                if (lhs.tertiaryFace != rhs.tertiaryFace)
-                    return lhs.tertiaryFace > rhs.tertiaryFace;
                 return lhs.hashcode > rhs.hashcode;
             }
             return lhs.handKind < rhs.handKind;
@@ -203,25 +201,21 @@ namespace ld
                 case HandKind.threeOfKind:
                     primaryFace = FindRepeatedFace(facesCounts, 3);
                     secondaryFace = FindRepeatedFace(facesCounts, 1);
-                    tertiaryFace = FindRepeatedFace(facesCounts, 1, secondaryFace);
                     break;
 
                 case HandKind.twoPairs:
                     primaryFace = FindRepeatedFace(facesCounts, 2);
                     secondaryFace = FindRepeatedFace(facesCounts, 2, primaryFace);
-                    tertiaryFace = FindRepeatedFace(facesCounts, 1, primaryFace, secondaryFace);
                     break;
 
                 case HandKind.pair:
                     primaryFace = FindRepeatedFace(facesCounts, 2);
                     secondaryFace = FindRepeatedFace(facesCounts, 1, primaryFace);
-                    tertiaryFace = FindRepeatedFace(facesCounts, 1, primaryFace, secondaryFace);
                     break;
 
                 case HandKind.none:
                     primaryFace = FindRepeatedFace(facesCounts, 1);
                     secondaryFace = FindRepeatedFace(facesCounts, 1, primaryFace);
-                    tertiaryFace = FindRepeatedFace(facesCounts, 1, primaryFace, secondaryFace);
                     break;
             }
         }
@@ -248,7 +242,6 @@ namespace ld
         private String faces = "";
         private int? primaryFace;
         private int? secondaryFace;
-        private int? tertiaryFace;
 
         private Dictionary<int, string> indexToFace = new Dictionary<int, string>();
         private Dictionary<string, int> faceToIndex = new Dictionary<string, int>();
