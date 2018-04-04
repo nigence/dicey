@@ -45,12 +45,42 @@ namespace ld
             return true;
         }
 
+
         private bool handKindsIdentifyTestPassed()
         {
+            bool allOkay = false;
             pokerDiceHand pdh = new pokerDiceHand("AAAAA");
-            if (pdh.getHandKind() != pokerDiceHand.HandKind.fiveOfKind)
-                return false;
-            return true;
+            for (int i = 0; i < 1; i++)
+            {
+                if (pdh.getHandKind() != pokerDiceHand.HandKind.fiveOfKind) break;
+
+                pdh = new pokerDiceHand("A9AAA");
+                if (pdh.getHandKind() != pokerDiceHand.HandKind.fourOfKind) break;
+
+                pdh = new pokerDiceHand("Q9QQA");
+                if (pdh.getHandKind() != pokerDiceHand.HandKind.threeOfKind) break;
+
+                pdh = new pokerDiceHand("Q9QQ9");
+                if (pdh.getHandKind() != pokerDiceHand.HandKind.fullHouse) break;
+
+                pdh = new pokerDiceHand("T9TQ9");
+                if (pdh.getHandKind() != pokerDiceHand.HandKind.twoPairs) break;
+
+                pdh = new pokerDiceHand("T9TQJ");
+                if (pdh.getHandKind() != pokerDiceHand.HandKind.pair) break;
+
+                pdh = new pokerDiceHand("9TKQJ");
+                if (pdh.getHandKind() != pokerDiceHand.HandKind.straight) break;
+
+                pdh = new pokerDiceHand("AKQJT");
+                if (pdh.getHandKind() != pokerDiceHand.HandKind.straight) break;
+
+                pdh = new pokerDiceHand("TA9KQ");
+                if (pdh.getHandKind() != pokerDiceHand.HandKind.none) break;
+
+                allOkay = true;
+            }
+            return allOkay;
         }
 
         private bool PokerDiceHandGreaterLessThanOperatorsTestPassed()

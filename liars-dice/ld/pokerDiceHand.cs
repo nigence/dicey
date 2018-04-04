@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ld
 {
@@ -33,6 +34,7 @@ namespace ld
 
             SetHashCode(facesCounts);
             SetHandKind(facesCounts);
+            RefineHandKind(facesCounts);
         }
 
         public HandKind getHandKind()
@@ -87,14 +89,31 @@ namespace ld
             return !(lhs == rhs);
         }
 
+        private static bool gt(pokerDiceHand lhs, pokerDiceHand rhs)
+        {
+            if (lhs.handKind == rhs.handKind)
+            {
+                if (lhs.primaryFace != rhs.primaryFace)
+                    return lhs.primaryFace > rhs.primaryFace;
+                if (lhs.secondaryFace != rhs.secondaryFace)
+                    return lhs.secondaryFace > rhs.secondaryFace;
+                if (lhs.tertiaryFace != rhs.tertiaryFace)
+                    return lhs.tertiaryFace > rhs.tertiaryFace;
+                return lhs.hashcode > rhs.hashcode;
+            }
+            return lhs.handKind < rhs.handKind;
+        }
+
         public static bool operator > (pokerDiceHand lhs, pokerDiceHand rhs)
         {
-            return false;
+            return gt(lhs, rhs);
         }
 
         public static bool operator < (pokerDiceHand lhs, pokerDiceHand rhs)
         {
-            return false;
+            if (lhs==rhs)
+                return false;
+            return (!gt(lhs, rhs));
         }
 
         public override int GetHashCode()
@@ -129,17 +148,107 @@ namespace ld
 
         private void SetHandKind(int[] facesCounts)
         {
+            List<int> fc = new List<int>();
             for (int i = 0; i < facesCounts.Length; i++)
+                fc.Add(facesCounts[i]);
+            List<int> unsortedFaceCounts = new List<int>();
+            unsortedFaceCounts = fc.ToList();
+
+            fc.Sort();
+            fc.Reverse();
+
+            switch (fc[0])
             {
-
-
+                case 5:
+                    handKind = HandKind.fiveOfKind; break;
+                case 4:
+                    handKind = HandKind.fourOfKind; break;
+                case 3:
+                    handKind = (fc[1] == 2 ? HandKind.fullHouse : HandKind.threeOfKind); break;
+                case 2:
+                    handKind = (fc[1] == 2 ? HandKind.twoPairs : HandKind.pair); break;
+                case 1:
+                    if (unsortedFaceCounts[faceToIndex["T"]] == 0 || 
+                        unsortedFaceCounts[faceToIndex["J"]] == 0 ||
+                        unsortedFaceCounts[faceToIndex["Q"]] == 0 ||
+                        unsortedFaceCounts[faceToIndex["K"]] == 0
+                        )
+                        handKind = HandKind.none;
+                    else
+                        handKind = HandKind.straight;
+                    break;
             }
-            handKind = HandKind.none;
+        }
+
+        private void RefineHandKind(int[] facesCounts)
+        {
+            switch(handKind)
+            {
+                case HandKind.fiveOfKind:
+                    primaryFace = FindRepeatedFace(facesCounts, 5);
+                    break;
+
+                case HandKind.fourOfKind:
+                    primaryFace = FindRepeatedFace(facesCounts, 4);
+                    secondaryFace = FindRepeatedFace(facesCounts, 1);
+                    break;
+
+                case HandKind.fullHouse:
+                    primaryFace = FindRepeatedFace(facesCounts, 3);
+                    secondaryFace = FindRepeatedFace(facesCounts, 2);
+                    break;
+
+                case HandKind.straight:
+
+                case HandKind.threeOfKind:
+                    primaryFace = FindRepeatedFace(facesCounts, 3);
+                    secondaryFace = FindRepeatedFace(facesCounts, 1);
+                    tertiaryFace = FindRepeatedFace(facesCounts, 1, secondaryFace);
+                    break;
+
+                case HandKind.twoPairs:
+                    primaryFace = FindRepeatedFace(facesCounts, 2);
+                    secondaryFace = FindRepeatedFace(facesCounts, 2, primaryFace);
+                    tertiaryFace = FindRepeatedFace(facesCounts, 1, primaryFace, secondaryFace);
+                    break;
+
+                case HandKind.pair:
+                    primaryFace = FindRepeatedFace(facesCounts, 2);
+                    secondaryFace = FindRepeatedFace(facesCounts, 1, primaryFace);
+                    tertiaryFace = FindRepeatedFace(facesCounts, 1, primaryFace, secondaryFace);
+                    break;
+
+                case HandKind.none:
+                    primaryFace = FindRepeatedFace(facesCounts, 1);
+                    secondaryFace = FindRepeatedFace(facesCounts, 1, primaryFace);
+                    tertiaryFace = FindRepeatedFace(facesCounts, 1, primaryFace, secondaryFace);
+                    break;
+            }
+        }
+
+        private int FindRepeatedFace(int[] facesCounts,  int frequency, int? excludeA=null, int? excludeB=null )
+        {
+            for (int j = indexToFace.Count - 1; j > -1; j--)
+            {
+                if(facesCounts[j]==frequency)
+                {
+                    if ((excludeA == null && excludeB == null)
+                        || ((excludeA == null) && (excludeB != j))
+                        || ((excludeB == null) && (excludeA != j))
+                        || ((excludeA != j) && (excludeB != j))
+                        )
+                        return j;
+                }
+            }
+            return -1;
         }
 
         private HandKind handKind;
         private int hashcode;
         private String faces = "";
+        private int? primaryFace;
+        private int? secondaryFace;
+        private int? tertiaryFace;
 
         private Dictionary<int, string> indexToFace = new Dictionary<int, string>();
         private Dictionary<string, int> faceToIndex = new Dictionary<string, int>();
