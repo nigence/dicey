@@ -91,15 +91,14 @@ namespace ld
 
         private static bool gt(pokerDiceHand lhs, pokerDiceHand rhs)
         {
-            if (lhs.handKind == rhs.handKind)
-            {
-                if (lhs.primaryFace != rhs.primaryFace)
-                    return lhs.primaryFace > rhs.primaryFace;
-                if (lhs.secondaryFace != rhs.secondaryFace)
-                    return lhs.secondaryFace > rhs.secondaryFace;
-                return lhs.hashcode > rhs.hashcode;
-            }
-            return lhs.handKind < rhs.handKind;
+            if (lhs.handKind != rhs.handKind)
+                return lhs.handKind < rhs.handKind;
+
+            if (lhs.primaryFace != rhs.primaryFace)
+                return lhs.primaryFace > rhs.primaryFace;
+            if (lhs.secondaryFace != rhs.secondaryFace)
+                return lhs.secondaryFace > rhs.secondaryFace;
+            return lhs.hashcode > rhs.hashcode;
         }
 
         public static bool operator > (pokerDiceHand lhs, pokerDiceHand rhs)
