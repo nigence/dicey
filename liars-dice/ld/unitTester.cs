@@ -22,6 +22,7 @@ namespace ld
                 if (!permutationsCalculatorTestPassed()) break;
                 if (!handKindsIdentifyTestPassed()) break;
                 if (!PokerDiceHandGreaterLessThanOperatorsTestPassed()) break;
+                if (!GameEngineNewGameTestPassed()) break;
                 allOkay = true;
             }
             if(!allOkay)
@@ -383,5 +384,33 @@ namespace ld
 		new pokerDiceHand("AKJT9"), // 120 permutations 
 		new pokerDiceHand("AQJT9"), // 120 permutations 
         };
+
+        private bool GameEngineNewGameTestPassed()
+        {
+            gameEngine ge = new gameEngine();
+
+            gameEngineReturnMessage response = ge.StartNewGame();
+
+            var ngd = response as newGameDetails;
+            if (ngd == null)
+                return false;
+
+            string game1AccessToken = ngd.GetAccessToken();
+            string game1Identifier = ngd.GetGameIdentifier();
+            string game2AccessToken = ngd.GetAccessToken();
+            string game2Identifier = ngd.GetGameIdentifier();
+
+            if (game1AccessToken != null && game2AccessToken != null && game1Identifier != null && game2Identifier != null)
+            {
+                if (game1AccessToken != game2AccessToken && game1Identifier != game2Identifier)
+                    return true;
+                else
+                    return false;
+            }
+            else
+                return false;
+
+
+        }
     }
 }

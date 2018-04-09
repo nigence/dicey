@@ -42,6 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="gameEngine.cs" />
+    <Compile Include="gameEngineReturnMessage.cs" />
+    <Compile Include="newGameDetails.cs" />
     <Compile Include="permutationsCalculator.cs" />
     <Compile Include="pokerDiceHand.cs" />
     <Compile Include="Program.cs" />
