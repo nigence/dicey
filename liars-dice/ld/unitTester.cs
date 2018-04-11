@@ -23,6 +23,7 @@ namespace ld
                 if (!handKindsIdentifyTestPassed()) break;
                 if (!PokerDiceHandGreaterLessThanOperatorsTestPassed()) break;
                 if (!GameEngineNewGameTestPassed()) break;
+                if (!GameEngineSampleGameTestPassed()) break;
                 allOkay = true;
             }
             if(!allOkay)
@@ -397,6 +398,12 @@ namespace ld
 
             string game1AccessToken = ngd.GetAccessToken();
             string game1Identifier = ngd.GetGameIdentifier();
+
+            response = ge.StartNewGame();
+            ngd = response as newGameDetails;
+            if (ngd == null)
+                return false;
+
             string game2AccessToken = ngd.GetAccessToken();
             string game2Identifier = ngd.GetGameIdentifier();
 
@@ -409,8 +416,46 @@ namespace ld
             }
             else
                 return false;
+        }
 
+        private bool GameEngineSampleGameTestPassed()
+        {
+            gameEngine ge = new gameEngine();
+            gameEngineReturnMessage response = ge.StartNewGame();
+            var ngd = response as newGameDetails;
+            string gameIdentifier = ngd.GetGameIdentifier();
+
+
+            // THREE PLAYERS JOIN
+            Dictionary<string, string> playersAccessTokens = new Dictionary<string, string>();
+
+            response = ge.JoinGame(gameIdentifier, "Bob");
+            var pr = response as playerRegistration;
+            if (pr.GetAccessToken() == null) return false;
+            playersAccessTokens.Add("Bob", pr.GetAccessToken());
+
+            response = ge.JoinGame(gameIdentifier, "Alice");
+            pr = response as playerRegistration;
+            if (pr.GetAccessToken() == null) return false;
+            playersAccessTokens.Add("Alice", pr.GetAccessToken());
+
+            response = ge.JoinGame(gameIdentifier, "Connie");
+            pr = response as playerRegistration;
+            if (pr.GetAccessToken() == null) return false;
+            playersAccessTokens.Add("Connie", pr.GetAccessToken());
+
+
+            // ALICE SEES THREE PLAYERS TOTAL
+            response = ge.Poll(playersAccessTokens["Alice"]);
+            var pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.GameName != gameIdentifier) return false;
+
+
+
+            return true;
 
         }
+
     }
 }

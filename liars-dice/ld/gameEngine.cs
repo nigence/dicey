@@ -15,9 +15,32 @@ namespace ld
 
         public gameEngineReturnMessage StartNewGame()
         {
-            newGameDetails returnMsg = new newGameDetails();
-            return returnMsg;
+            string accessToken = "access-token-" + nextAccessTokenNumber.ToString();
+            nextAccessTokenNumber++;
+            string id = "game-identifier-" + nextIdentifierNumber.ToString();
+            nextIdentifierNumber++;
 
+            newGameDetails returnMsg = new newGameDetails(true, accessToken, id);
+            return returnMsg;
         }
+
+        public gameEngineReturnMessage JoinGame(string gameName, string playerName)
+        {
+            string accessToken = "access-token-" + nextAccessTokenNumber.ToString();
+            nextAccessTokenNumber++;
+
+            playerRegistration returnMsg = new playerRegistration(true, accessToken);
+            return returnMsg;
+        }
+
+        public gameEngineReturnMessage Poll(string accessToken)
+        {
+            pollResponse returnMessage = new pollResponse();
+            return returnMessage;
+        }
+
+        private static int nextAccessTokenNumber = 1;
+        private static int nextIdentifierNumber = 1;
+
     }
 }

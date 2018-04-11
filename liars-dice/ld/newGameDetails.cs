@@ -8,27 +8,30 @@ namespace ld
 {
     class newGameDetails : gameEngineReturnMessage
     {
-        public newGameDetails()
+        public newGameDetails( bool gameCreatedOkay, string accessToken, string gameName)
         {
-
+            ok = gameCreatedOkay;
+            token = accessToken;
+            id = gameName;
         }
 
         public string GetAccessToken()
         {
-            string accessToken = "access-token-" + nextAccessTokenNumber.ToString();
-            nextAccessTokenNumber++;
-            return accessToken;
+            if (!ok)
+                return null;
+            return token;
         }
 
         public string GetGameIdentifier()
         {
-            string id = "game-identifier-" + nextIdentifierNumber.ToString();
-            nextIdentifierNumber++;
+            if (!ok)
+                return null;
             return id;
         }
 
-        private static int nextAccessTokenNumber = 1;
-        private static int nextIdentifierNumber = 1;
+        private bool ok;
+        private string id;
+        private string token;
 
     }
 }

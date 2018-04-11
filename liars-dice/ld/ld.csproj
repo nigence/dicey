@@ -46,7 +46,9 @@
     <Compile Include="gameEngineReturnMessage.cs" />
     <Compile Include="newGameDetails.cs" />
     <Compile Include="permutationsCalculator.cs" />
+    <Compile Include="playerRegistration.cs" />
     <Compile Include="pokerDiceHand.cs" />
+    <Compile Include="pollResponse.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="unitTester.cs" />
