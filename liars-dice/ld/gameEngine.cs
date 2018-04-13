@@ -10,37 +10,54 @@ namespace ld
     {
         public  gameEngine()
         {
-
+            gamesList = new List<game>();
         }
 
-        public gameEngineReturnMessage StartNewGame()
+        public gameEngineReturnMessage StartNewGame(string adminsName)
         {
-            string accessToken = "access-token-" + nextAccessTokenNumber.ToString();
-            nextAccessTokenNumber++;
-            string id = "game-identifier-" + nextIdentifierNumber.ToString();
-            nextIdentifierNumber++;
+            player administrator = new player(adminsName);
+            game newGame = new game(administrator);
+            gamesList.Add(newGame);
 
-            newGameDetails returnMsg = new newGameDetails(true, accessToken, id);
+
+            newGameDetails returnMsg = new newGameDetails(true, administrator.GetId(), newGame.GetId());
             return returnMsg;
         }
 
         public gameEngineReturnMessage JoinGame(string gameName, string playerName)
         {
-            string accessToken = "access-token-" + nextAccessTokenNumber.ToString();
-            nextAccessTokenNumber++;
+            player p = new player(playerName);
 
-            playerRegistration returnMsg = new playerRegistration(true, accessToken);
+            foreach( var g in gamesList )
+            {
+                if( g.GetId() == gameName)
+                {
+                    g.Join(p);
+                    break;
+                }
+            }
+
+            playerRegistration returnMsg = new playerRegistration(true, p.GetId());
             return returnMsg;
         }
 
         public gameEngineReturnMessage Poll(string accessToken)
         {
             pollResponse returnMessage = new pollResponse();
+
+            //Find the player
+            foreach(var g in gamesList)
+            {
+                if(g.hasPlayerId(accessToken))
+                {
+                    returnMessage.gameName = g.GetId();
+                    break;
+                }
+            }
             return returnMessage;
         }
 
-        private static int nextAccessTokenNumber = 1;
-        private static int nextIdentifierNumber = 1;
+        List<game> gamesList;
 
     }
 }

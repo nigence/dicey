@@ -8,6 +8,6 @@ namespace ld
 {
     class pollResponse : gameEngineReturnMessage
     {
-        public string GameName { get; private set; }
+        public string gameName { get;  set; }
     }
 }

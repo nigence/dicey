@@ -390,7 +390,7 @@ namespace ld
         {
             gameEngine ge = new gameEngine();
 
-            gameEngineReturnMessage response = ge.StartNewGame();
+            gameEngineReturnMessage response = ge.StartNewGame("Egbert");
 
             var ngd = response as newGameDetails;
             if (ngd == null)
@@ -399,7 +399,7 @@ namespace ld
             string game1AccessToken = ngd.GetAccessToken();
             string game1Identifier = ngd.GetGameIdentifier();
 
-            response = ge.StartNewGame();
+            response = ge.StartNewGame("Nobacon");
             ngd = response as newGameDetails;
             if (ngd == null)
                 return false;
@@ -421,12 +421,12 @@ namespace ld
         private bool GameEngineSampleGameTestPassed()
         {
             gameEngine ge = new gameEngine();
-            gameEngineReturnMessage response = ge.StartNewGame();
+            gameEngineReturnMessage response = ge.StartNewGame("Alice");
             var ngd = response as newGameDetails;
             string gameIdentifier = ngd.GetGameIdentifier();
 
 
-            // THREE PLAYERS JOIN
+            // TWO MORE PLAYERS JOIN
             Dictionary<string, string> playersAccessTokens = new Dictionary<string, string>();
 
             response = ge.JoinGame(gameIdentifier, "Bob");
@@ -434,10 +434,6 @@ namespace ld
             if (pr.GetAccessToken() == null) return false;
             playersAccessTokens.Add("Bob", pr.GetAccessToken());
 
-            response = ge.JoinGame(gameIdentifier, "Alice");
-            pr = response as playerRegistration;
-            if (pr.GetAccessToken() == null) return false;
-            playersAccessTokens.Add("Alice", pr.GetAccessToken());
 
             response = ge.JoinGame(gameIdentifier, "Connie");
             pr = response as playerRegistration;
@@ -445,12 +441,12 @@ namespace ld
             playersAccessTokens.Add("Connie", pr.GetAccessToken());
 
 
-            // ALICE SEES THREE PLAYERS TOTAL
-            response = ge.Poll(playersAccessTokens["Alice"]);
+            // BOB SEES THREE PLAYERS TOTAL
+            response = ge.Poll(playersAccessTokens["Bob"]);
             var pollresponse = response as pollResponse;
             if (pollresponse == null) return false;
-            if (pollresponse.GameName != gameIdentifier) return false;
-
+            if (pollresponse.gameName != gameIdentifier) return false;
+            if (pollresponse.playerStatusLines.Count != 3) return false;
 
 
             return true;
