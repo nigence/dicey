@@ -32,6 +32,16 @@ namespace ld
             return true;
         }
 
+        public List<string> GetPlayersNames()
+        {
+            List<string> names = new List<string>();
+            foreach( var p in playersList )
+            {
+                names.Add(p.GetName());
+            }
+            return names;
+        }
+
         private static int nextIdentifierNumber = 1;
         private string identifier;
         private List<player> playersList;

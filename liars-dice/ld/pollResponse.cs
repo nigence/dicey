@@ -9,5 +9,7 @@ namespace ld
     class pollResponse : gameEngineReturnMessage
     {
         public string gameName { get;  set; }
+
+        public List<playerStatusLine> playerStatusLines = new List<playerStatusLine>();
     }
 }

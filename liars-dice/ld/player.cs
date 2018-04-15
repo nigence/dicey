@@ -21,6 +21,11 @@ namespace ld
             return identifier;
         }
 
+        public string GetName()
+        {
+            return name;
+        } 
+
         private static int nextAccessTokenNumber = 1;
         private string identifier;
         private string name;

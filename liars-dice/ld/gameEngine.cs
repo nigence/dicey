@@ -46,18 +46,30 @@ namespace ld
             pollResponse returnMessage = new pollResponse();
 
             //Find the player
+            game associatedGame = null;
             foreach(var g in gamesList)
             {
                 if(g.hasPlayerId(accessToken))
                 {
+                    associatedGame = g;
                     returnMessage.gameName = g.GetId();
                     break;
                 }
             }
+
+            List<string> names = associatedGame.GetPlayersNames();
+
+            foreach(var n in names)
+            {
+                playerStatusLine psl = new playerStatusLine(n);
+                returnMessage.playerStatusLines.Add(psl);
+            }
             return returnMessage;
         }
 
-        List<game> gamesList;
+
+
+        private List<game> gamesList;
 
     }
 }
