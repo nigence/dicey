@@ -36,9 +36,7 @@ namespace ld
         {
             List<string> names = new List<string>();
             foreach( var p in playersList )
-            {
                 names.Add(p.GetName());
-            }
             return names;
         }
 

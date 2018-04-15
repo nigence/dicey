@@ -17,6 +17,7 @@ namespace ld
         {
             return mName;
         }
+
         string mName;
     }
 }

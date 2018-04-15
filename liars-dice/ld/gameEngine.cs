@@ -26,16 +26,14 @@ namespace ld
 
         public gameEngineReturnMessage JoinGame(string gameName, string playerName)
         {
+            game g = FindGameByName(gameName);
+
+            if (g == null)
+                return null;
+
             player p = new player(playerName);
 
-            foreach( var g in gamesList )
-            {
-                if( g.GetId() == gameName)
-                {
-                    g.Join(p);
-                    break;
-                }
-            }
+            g.Join(p);
 
             playerRegistration returnMsg = new playerRegistration(true, p.GetId());
             return returnMsg;
@@ -45,28 +43,41 @@ namespace ld
         {
             pollResponse returnMessage = new pollResponse();
 
-            //Find the player
-            game associatedGame = null;
-            foreach(var g in gamesList)
-            {
-                if(g.hasPlayerId(accessToken))
-                {
-                    associatedGame = g;
-                    returnMessage.gameName = g.GetId();
-                    break;
-                }
-            }
+            game associatedGame = FindGameByPlayer(accessToken);
+
+            if (associatedGame == null) return null;
+
+            returnMessage.gameName = associatedGame.GetId();
 
             List<string> names = associatedGame.GetPlayersNames();
 
             foreach(var n in names)
-            {
-                playerStatusLine psl = new playerStatusLine(n);
-                returnMessage.playerStatusLines.Add(psl);
-            }
+                returnMessage.playerStatusLines.Add(new playerStatusLine(n));
+
             return returnMessage;
         }
 
+        private game FindGameByName( string gameName)
+        {
+            foreach (var g in gamesList)
+            {
+                if (g.GetId() == gameName)
+                {
+                   return g;
+                }
+            }
+            return null;
+        }
+
+        private game FindGameByPlayer(string playerAccessToken)
+        {
+            foreach (var g in gamesList)
+            {
+                if (g.hasPlayerId(playerAccessToken))
+                    return g;
+            }
+            return null;
+        }
 
 
         private List<game> gamesList;
