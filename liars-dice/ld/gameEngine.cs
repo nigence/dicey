@@ -27,11 +27,10 @@ namespace ld
         {
             game g = FindGameByName(gameName);
 
-            if (g == null)
-                return null;
+            if (g == null || !g.isOpenToNewPlayers())
+                return new playerRegistration(false, "");
 
             player p = new player(playerName);
-
             g.Join(p);
 
             playerRegistration returnMsg = new playerRegistration(true, p.GetId());

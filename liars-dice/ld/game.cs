@@ -31,12 +31,18 @@ namespace ld
 
         public void Join(player newJoiner)
         {
-            playersList.Add(newJoiner);
+            if (status == gameStatus.playersJoining)
+                playersList.Add(newJoiner);
         }
 
         public void CloseToNewJoiners()
         {
             status = gameStatus.administratorShufflingPlayers;
+        }
+
+        public bool isOpenToNewPlayers()
+        {
+            return (status == gameStatus.playersJoining) ;
         }
 
         public bool hasPlayerId(string Id)
