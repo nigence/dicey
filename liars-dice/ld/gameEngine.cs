@@ -50,7 +50,15 @@ namespace ld
             return returnMsg;
         }
 
-        public gameEngineReturnMessage Poll(string accessToken)
+        public gameEngineReturnMessage SetPlayersRunningOrder(string accessToken, List<string> playersNames)
+        {
+            boolResponse returnMsg = new boolResponse();
+            returnMsg.okay = false;
+
+            return returnMsg;
+        }
+
+        public gameEngineReturnMessage  Poll(string accessToken)
         {
             pollResponse returnMessage = new pollResponse();
 

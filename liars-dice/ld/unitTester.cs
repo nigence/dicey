@@ -434,7 +434,6 @@ namespace ld
             if (pr.GetAccessToken() == null) return false;
             playersAccessTokens.Add("Bob", pr.GetAccessToken());
 
-
             response = ge.JoinGame(gameIdentifier, "Connie");
             pr = response as playerRegistration;
             if (pr.GetAccessToken() == null) return false;
@@ -467,6 +466,18 @@ namespace ld
             if (pr == null) return false;
             if (pr.GetAccessToken() != null) return false;
 
+            //ALICE(ADMIN) SHUFFLES THE PLAYERS INTO THE RUNNING ORDER
+            List<string> runningOrder = new List<string> { "Bob", "Alice", "Connie" };
+            response = ge.SetPlayersRunningOrder(playersAccessTokens["Alice"], runningOrder);
+
+            //CONNIE SEES THE NEW RUNNING ORDER
+            response = ge.Poll(playersAccessTokens["Connie"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.playerStatusLines.Count != 3) return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
 
 
             return true;
