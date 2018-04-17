@@ -13,12 +13,11 @@ namespace ld
             gamesList = new List<game>();
         }
 
-        public gameEngineReturnMessage StartNewGame(string adminsName)
+        public gameEngineReturnMessage CreateNewGame(string adminsName)
         {
             player administrator = new player(adminsName);
             game newGame = new game(administrator);
             gamesList.Add(newGame);
-
 
             newGameDetails returnMsg = new newGameDetails(true, administrator.GetId(), newGame.GetId());
             return returnMsg;
@@ -39,6 +38,19 @@ namespace ld
             return returnMsg;
         }
 
+        public gameEngineReturnMessage CloseForNewJoiners(string accessToken)
+        {
+            boolResponse returnMsg = new boolResponse();
+            returnMsg.okay = false;
+
+            var g = FindGameByPlayer(accessToken);
+            if (g == null) return returnMsg;
+            if (!g.hasAdministrator(accessToken)) return returnMsg;
+            g.CloseToNewJoiners();
+            returnMsg.okay = true;
+            return returnMsg;
+        }
+
         public gameEngineReturnMessage Poll(string accessToken)
         {
             pollResponse returnMessage = new pollResponse();
@@ -48,6 +60,7 @@ namespace ld
             if (associatedGame == null) return null;
 
             returnMessage.gameName = associatedGame.GetId();
+            returnMessage.status = associatedGame.GetStatus();
 
             List<string> names = associatedGame.GetPlayersNames();
 

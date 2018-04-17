@@ -10,6 +10,8 @@ namespace ld
     {
         public string gameName { get;  set; }
 
+        public gameStatus status { get; set; }
+
         public List<playerStatusLine> playerStatusLines = new List<playerStatusLine>();
     }
 }

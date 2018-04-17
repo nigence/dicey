@@ -42,9 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="boolResponse.cs" />
     <Compile Include="game.cs" />
     <Compile Include="gameEngine.cs" />
     <Compile Include="gameEngineReturnMessage.cs" />
+    <Compile Include="gameStatus.cs" />
     <Compile Include="newGameDetails.cs" />
     <Compile Include="permutationsCalculator.cs" />
     <Compile Include="player.cs" />

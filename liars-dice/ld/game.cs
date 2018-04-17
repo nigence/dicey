@@ -15,6 +15,8 @@ namespace ld
             nextIdentifierNumber++;
             playersList = new List<player>(); 
             playersList.Add(administrator);
+            mAdministrator = administrator;
+            status = gameStatus.playersJoining;
         }
 
         public string GetId()
@@ -22,14 +24,29 @@ namespace ld
             return identifier;
         }
 
+        public gameStatus GetStatus()
+        {
+            return status;
+        }
+
         public void Join(player newJoiner)
         {
             playersList.Add(newJoiner);
         }
 
+        public void CloseToNewJoiners()
+        {
+            status = gameStatus.administratorShufflingPlayers;
+        }
+
         public bool hasPlayerId(string Id)
         {
             return true;
+        }
+
+        public bool hasAdministrator(string playerAccessToken)
+        {
+            return (mAdministrator.GetId() == playerAccessToken);
         }
 
         public List<string> GetPlayersNames()
@@ -42,7 +59,8 @@ namespace ld
 
         private static int nextIdentifierNumber = 1;
         private string identifier;
-        private List<player> playersList;
-
+        private gameStatus status;
+        private List<player> playersList; //includes administrator
+        private player mAdministrator;
     }
 }

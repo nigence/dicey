@@ -390,7 +390,7 @@ namespace ld
         {
             gameEngine ge = new gameEngine();
 
-            gameEngineReturnMessage response = ge.StartNewGame("Egbert");
+            gameEngineReturnMessage response = ge.CreateNewGame("Egbert");
 
             var ngd = response as newGameDetails;
             if (ngd == null)
@@ -399,7 +399,7 @@ namespace ld
             string game1AccessToken = ngd.GetAccessToken();
             string game1Identifier = ngd.GetGameIdentifier();
 
-            response = ge.StartNewGame("Nobacon");
+            response = ge.CreateNewGame("Nobacon");
             ngd = response as newGameDetails;
             if (ngd == null)
                 return false;
@@ -421,14 +421,14 @@ namespace ld
         private bool GameEngineSampleGameTestPassed()
         {
             gameEngine ge = new gameEngine();
-            gameEngineReturnMessage response = ge.StartNewGame("Alice");
+            gameEngineReturnMessage response = ge.CreateNewGame("Alice");
             var ngd = response as newGameDetails;
             string gameIdentifier = ngd.GetGameIdentifier();
 
+            Dictionary<string, string> playersAccessTokens = new Dictionary<string, string>();
+            playersAccessTokens.Add("Alice", ngd.GetAccessToken());
 
             // TWO MORE PLAYERS JOIN
-            Dictionary<string, string> playersAccessTokens = new Dictionary<string, string>();
-
             response = ge.JoinGame(gameIdentifier, "Bob");
             var pr = response as playerRegistration;
             if (pr.GetAccessToken() == null) return false;
@@ -447,6 +447,26 @@ namespace ld
             if (pollresponse == null) return false;
             if (pollresponse.gameName != gameIdentifier) return false;
             if (pollresponse.playerStatusLines.Count != 3) return false;
+
+            //BOB SEES THAT THE PLAYERS ARE ALICE, BOB, AND CONNIE
+            if (pollresponse.playerStatusLines[0].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
+
+            //BOB SEES THE GAME NAME AND THAT PLAYERS ARE STILL ABLE TO JOIN
+            if (pollresponse.gameName != gameIdentifier) return false;
+            if (pollresponse.status != gameStatus.playersJoining) return false;
+
+            //DAVE IS TOO LATE TO JOIN THE GAME
+            response = ge.CloseForNewJoiners(playersAccessTokens["Alice"]);
+            var br = response as boolResponse;
+            if (br == null) return false;
+            if (!br.okay) return false;
+            response = ge.JoinGame(gameIdentifier, "Dave");
+            pr = response as playerRegistration;
+            if (pr == null) return false;
+            if (pr.GetAccessToken() != null) return false;
+
 
 
             return true;
