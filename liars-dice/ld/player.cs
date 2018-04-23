@@ -24,26 +24,11 @@ namespace ld
         public string GetName()
         {
             return name;
-        } 
+        }
 
         public void SetRunningOrder(int order)
         {
             runningOrder = order;
-        }
-
-        public int GetRunningOrder()
-        {
-            return runningOrder;
-        }
-
-        public static bool operator >(player lhs, player rhs)
-        {
-            return (lhs.GetRunningOrder() < rhs.GetRunningOrder());
-        }
-
-        public static bool operator <(player lhs, player rhs)
-        {
-            return (lhs.GetRunningOrder() > rhs.GetRunningOrder());
         }
 
         public int CompareTo(player that)
