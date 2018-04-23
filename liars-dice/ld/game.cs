@@ -47,8 +47,34 @@ namespace ld
 
         public bool hasPlayerId(string Id)
         {
-            return true;
+            foreach(var p in playersList)
+            {
+                if (p.GetId() == Id)
+                    return true;
+            }
+            return false;
         }
+
+        public bool hasPlayerNamed(string playerName)
+        {
+            foreach (var p in playersList)
+            {
+                if (p.GetName() == playerName)
+                    return true;
+            }
+            return false;
+        }
+
+        public player GetPlayerByName(string name)
+        {
+            foreach (var p in playersList)
+            {
+                if (p.GetName() == name)
+                    return p;
+            }
+            return null;
+        }
+
 
         public bool hasAdministrator(string playerAccessToken)
         {
@@ -61,6 +87,28 @@ namespace ld
             foreach( var p in playersList )
                 names.Add(p.GetName());
             return names;
+        }
+
+        public bool SetRunningOrder( List<string> playersNames )
+        {
+            if (playersList.Count != playersNames.Count)
+                return false;
+
+            foreach(var n in playersNames)
+            {
+                if (!this.hasPlayerNamed(n))
+                    return false;
+            }
+
+            int runningOrderNumber = 0;
+            foreach(var n in playersNames)
+            {
+                var p = this.GetPlayerByName(n);
+                p.SetRunningOrder(runningOrderNumber);
+                runningOrderNumber++;
+            }
+            playersList.Sort();
+            return true;
         }
 
         private static int nextIdentifierNumber = 1;

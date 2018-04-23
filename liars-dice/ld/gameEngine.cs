@@ -54,7 +54,10 @@ namespace ld
         {
             boolResponse returnMsg = new boolResponse();
             returnMsg.okay = false;
-
+            var g = FindGameByPlayer(accessToken);
+            if (g == null) return returnMsg;
+            if (!g.hasAdministrator(accessToken)) return returnMsg;
+            returnMsg.okay = g.SetRunningOrder(playersNames);
             return returnMsg;
         }
 
