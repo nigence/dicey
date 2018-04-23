@@ -64,15 +64,12 @@ namespace ld
         public gameEngineReturnMessage StartGame(string accessToken)
         {
             boolResponse returnMsg = new boolResponse();
-            returnMsg.okay = false;
-            var g = FindGameByPlayer(accessToken);
-            if (g == null) return returnMsg;
-            if (!g.hasAdministrator(accessToken)) return returnMsg;
-
-            returnMsg.okay = false;
+            var g = FindAdministratorsGame(accessToken);
+            returnMsg.okay = (g != null);
+            if (g != null)
+                g.Start();
             return returnMsg;
         }
-
 
         public gameEngineReturnMessage  Poll(string accessToken)
         {
@@ -115,6 +112,13 @@ namespace ld
             return null;
         }
 
+        private game FindAdministratorsGame(string accessToken)
+        {
+            var g = FindGameByPlayer(accessToken);
+            if (g == null) return null;
+            if (!g.hasAdministrator(accessToken)) return null;
+            return g;
+        }
 
         private List<game> gamesList;
 

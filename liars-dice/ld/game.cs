@@ -45,6 +45,11 @@ namespace ld
             return (status == gameStatus.playersJoining) ;
         }
 
+        public void Start()
+        {
+            status = gameStatus.awaitingPlayerToClaimHandRank;
+        }
+
         public bool hasPlayerId(string Id)
         {
             foreach(var p in playersList)
