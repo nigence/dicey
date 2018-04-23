@@ -61,6 +61,19 @@ namespace ld
             return returnMsg;
         }
 
+        public gameEngineReturnMessage StartGame(string accessToken)
+        {
+            boolResponse returnMsg = new boolResponse();
+            returnMsg.okay = false;
+            var g = FindGameByPlayer(accessToken);
+            if (g == null) return returnMsg;
+            if (!g.hasAdministrator(accessToken)) return returnMsg;
+
+            returnMsg.okay = false;
+            return returnMsg;
+        }
+
+
         public gameEngineReturnMessage  Poll(string accessToken)
         {
             pollResponse returnMessage = new pollResponse();

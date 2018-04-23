@@ -479,6 +479,58 @@ namespace ld
             if (pollresponse.playerStatusLines[1].GetName() != "Alice") return false;
             if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
 
+            //BOB SEES THE NEW RUNNING ORDER
+            response = ge.Poll(playersAccessTokens["Bob"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.playerStatusLines.Count != 3) return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
+
+            //ALICE (ADMIN) SEES THE NEW RUNNING ORDER HERSELF
+            response = ge.Poll(playersAccessTokens["Alice"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.playerStatusLines.Count != 3) return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
+
+            //ALICE(ADMIN) CHANGES MIND AND RE-SHUFFLES THE PLAYERS INTO ANOTHER RUNNING ORDER
+            List<string> amendedrunningOrder = new List<string> { "Bob", "Connie", "Alice" };
+            response = ge.SetPlayersRunningOrder(playersAccessTokens["Alice"], amendedrunningOrder);
+
+            //CONNIE SEES THE LATEST RUNNING ORDER
+            response = ge.Poll(playersAccessTokens["Connie"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.playerStatusLines.Count != 3) return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Alice") return false;
+
+            //BOB SEES THE LATEST RUNNING ORDER
+            response = ge.Poll(playersAccessTokens["Bob"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.playerStatusLines.Count != 3) return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Alice") return false;
+
+            //ALICE (ADMIN) SETS THE GAME GOING
+            //BOB SEES THAT THE GAME IS RUNNING
+            response = ge.StartGame(playersAccessTokens["Alice"]);
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (!br.okay) return false;
+            response = ge.Poll(playersAccessTokens["Bob"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerToClaimHandRank) return false;
+
+
 
             return true;
 
