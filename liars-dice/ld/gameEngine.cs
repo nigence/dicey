@@ -86,6 +86,8 @@ namespace ld
             foreach(var n in names)
                 returnMessage.playerStatusLines.Add(new playerStatusLine(n));
 
+            returnMessage.awaitingActionFromPlayerName = associatedGame.GetPlayerNameWithActionAwaited();
+
             return returnMessage;
         }
 

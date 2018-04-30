@@ -48,6 +48,7 @@ namespace ld
         public void Start()
         {
             status = gameStatus.awaitingPlayerToClaimHandRank;
+            playerToActIndex = 0;
         }
 
         public bool hasPlayerId(string Id)
@@ -78,6 +79,12 @@ namespace ld
                     return p;
             }
             return null;
+        }
+
+        public string GetPlayerNameWithActionAwaited()
+        {
+            player p = playersList[playerToActIndex];
+            return p.GetName();
         }
 
 
@@ -121,5 +128,6 @@ namespace ld
         private gameStatus status;
         private List<player> playersList; //includes administrator
         private player mAdministrator;
+        private int playerToActIndex;
     }
 }
