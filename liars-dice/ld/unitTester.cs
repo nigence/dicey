@@ -533,6 +533,10 @@ namespace ld
             //AND HE SEES THAT THE GAME IS WAITING FOR HIM TO DECLARE A HAND
             if (pollresponse.awaitingActionFromPlayerName != "Bob") return false;
 
+            //HIS HAND IS AJT99
+            pokerDiceHand AJT99 = new pokerDiceHand("AJT99");
+            if (pollresponse.namedPlayersHand == null) return false;
+            if (pollresponse.namedPlayersHand != AJT99) return false;
 
 
             return true;

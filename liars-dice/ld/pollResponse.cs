@@ -14,6 +14,8 @@ namespace ld
 
         public string awaitingActionFromPlayerName { get; set; }
 
+        public pokerDiceHand namedPlayersHand { get; set; }
+
         public List<playerStatusLine> playerStatusLines = new List<playerStatusLine>();
     }
 }
