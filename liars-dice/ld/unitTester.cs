@@ -530,6 +530,9 @@ namespace ld
             if (pollresponse == null) return false;
             if (pollresponse.status != gameStatus.awaitingPlayerToClaimHandRank) return false;
 
+            //AND HE SEES THAT THE GAME IS WAITING FOR HIM TO DECLARE A HAND
+            if (pollresponse.awaitingActionFromPlayerName != "Bob") return false;
+
 
 
             return true;

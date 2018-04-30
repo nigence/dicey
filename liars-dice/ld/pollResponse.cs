@@ -12,6 +12,8 @@ namespace ld
 
         public gameStatus status { get; set; }
 
+        public string awaitingActionFromPlayerName { get; set; }
+
         public List<playerStatusLine> playerStatusLines = new List<playerStatusLine>();
     }
 }
