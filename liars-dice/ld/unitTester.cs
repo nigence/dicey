@@ -8,8 +8,11 @@ namespace ld
 {
     class unitTester
     {
+        private pokerDieRollerTestMock pdrtm;
+
         public unitTester()
         {
+            pdrtm = new pokerDieRollerTestMock();
         }
 
         public void runAll()
@@ -388,7 +391,12 @@ namespace ld
 
         private bool GameEngineNewGameTestPassed()
         {
-            gameEngine ge = new gameEngine();
+            gameEngine ge = new gameEngine(pdrtm);
+            pdrtm.EnqueueRoll(pokerDieFace.T);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
 
             gameEngineReturnMessage response = ge.CreateNewGame("Egbert");
 
@@ -399,6 +407,11 @@ namespace ld
             string game1AccessToken = ngd.GetAccessToken();
             string game1Identifier = ngd.GetGameIdentifier();
 
+            pdrtm.EnqueueRoll(pokerDieFace.T);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
             response = ge.CreateNewGame("Nobacon");
             ngd = response as newGameDetails;
             if (ngd == null)
@@ -420,7 +433,12 @@ namespace ld
 
         private bool GameEngineSampleGameTestPassed()
         {
-            gameEngine ge = new gameEngine();
+            gameEngine ge = new gameEngine(pdrtm);
+            pdrtm.EnqueueRoll(pokerDieFace.T);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
             gameEngineReturnMessage response = ge.CreateNewGame("Alice");
             var ngd = response as newGameDetails;
             string gameIdentifier = ngd.GetGameIdentifier();
@@ -535,8 +553,8 @@ namespace ld
 
             //HIS HAND IS AJT99
             pokerDiceHand AJT99 = new pokerDiceHand("AJT99");
-            if (pollresponse.namedPlayersHand == null) return false;
-            if (pollresponse.namedPlayersHand != AJT99) return false;
+            if (!pollresponse.HasHandToView()) return false;
+            if (pollresponse.GetNamedPlayersHand() != AJT99) return false;
 
 
             return true;

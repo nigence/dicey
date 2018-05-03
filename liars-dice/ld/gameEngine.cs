@@ -8,15 +8,16 @@ namespace ld
 {
     class gameEngine
     {
-        public  gameEngine()
+        public  gameEngine(pokerDieRoller roller)
         {
             gamesList = new List<game>();
+            mRoller = roller;
         }
 
         public gameEngineReturnMessage CreateNewGame(string adminsName)
         {
             player administrator = new player(adminsName);
-            game newGame = new game(administrator);
+            game newGame = new game(administrator, mRoller);
             gamesList.Add(newGame);
 
             newGameDetails returnMsg = new newGameDetails(true, administrator.GetId(), newGame.GetId());
@@ -88,6 +89,14 @@ namespace ld
 
             returnMessage.awaitingActionFromPlayerName = associatedGame.GetPlayerNameWithActionAwaited();
 
+            //Decide whether or not to reveal actual hand to the calling player
+            if ( (associatedGame.GetPlayerById(accessToken).GetName() == associatedGame.GetPlayerNameWithActionAwaited())
+                && (associatedGame.GetStatus() == gameStatus.awaitingPlayerToClaimHandRank))
+            {
+                returnMessage.SetHandToView(associatedGame.GetActualHand());
+            }
+
+
             return returnMessage;
         }
 
@@ -122,6 +131,7 @@ namespace ld
         }
 
         private List<game> gamesList;
+        private pokerDieRoller mRoller;
 
     }
 }

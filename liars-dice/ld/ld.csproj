@@ -53,6 +53,9 @@
     <Compile Include="playerRegistration.cs" />
     <Compile Include="playerStatusLine.cs" />
     <Compile Include="pokerDiceHand.cs" />
+    <Compile Include="pokerDiceHandReroller.cs" />
+    <Compile Include="pokerDieRoller.cs" />
+    <Compile Include="pokerDieRollerTestMock.cs" />
     <Compile Include="pollResponse.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -8,7 +8,7 @@ namespace ld
 {
     class game
     {
-        public game(player administrator)
+        public game(player administrator, pokerDieRoller dieRoller)
         {
             string id = "game-identifier-" + nextIdentifierNumber.ToString();
             identifier = id;
@@ -17,6 +17,9 @@ namespace ld
             playersList.Add(administrator);
             mAdministrator = administrator;
             status = gameStatus.playersJoining;
+            reroller = new pokerDiceHandReroller(dieRoller);
+            currentHandClaim = null;
+            currentActualHand = reroller.GetNewHand();
         }
 
         public string GetId()
@@ -81,6 +84,16 @@ namespace ld
             return null;
         }
 
+        public player GetPlayerById(string playerAccessToken)
+        {
+            foreach (var p in playersList)
+            {
+                if (p.GetId() == playerAccessToken)
+                    return p;
+            }
+            return null;
+        }
+
         public string GetPlayerNameWithActionAwaited()
         {
             player p = playersList[playerToActIndex];
@@ -123,11 +136,19 @@ namespace ld
             return true;
         }
 
+        public pokerDiceHand GetActualHand()
+        {
+            return currentActualHand;
+        }
+
         private static int nextIdentifierNumber = 1;
         private string identifier;
         private gameStatus status;
         private List<player> playersList; //includes administrator
         private player mAdministrator;
         private int playerToActIndex;
+        private pokerDiceHand currentHandClaim;
+        private pokerDiceHand currentActualHand;
+        private pokerDiceHandReroller reroller;
     }
 }
