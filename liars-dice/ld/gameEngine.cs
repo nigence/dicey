@@ -100,7 +100,10 @@ namespace ld
 
         public void DeclareHand(string accessToken, pokerDiceHand hand)
         {
-
+            game associatedGame = FindGameByPlayer(accessToken);
+            if (associatedGame == null)
+                return;
+            associatedGame.DeclareHand(accessToken, hand);
         }
 
         private game FindGameByName( string gameName)

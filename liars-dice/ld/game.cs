@@ -141,6 +141,26 @@ namespace ld
             return currentActualHand;
         }
 
+        public void DeclareHand(string playerId, pokerDiceHand hand)
+        {
+            player a = GetPlayerById(playerId);
+            string aName = a.GetName();
+            string bName = this.GetPlayerNameWithActionAwaited();
+            if (aName != bName) return;
+            if (this.status != gameStatus.awaitingPlayerToClaimHandRank) return;
+
+            a.SetHandClaim(hand);
+            MoveTurnToNextPlayer();
+            status = gameStatus.awaitingPlayerDecisionAcceptOrCallLiar;
+        }
+
+        private void MoveTurnToNextPlayer()
+        {
+            playerToActIndex++;
+            if (playerToActIndex == playersList.Count())
+                playerToActIndex = 0;
+        }
+
         private static int nextIdentifierNumber = 1;
         private string identifier;
         private gameStatus status;

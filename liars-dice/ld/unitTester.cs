@@ -573,6 +573,17 @@ namespace ld
             if (pollresponse.playerStatusLines[0].getClaim() != new pokerDiceHand("99TJQ")) return false;
             if (pollresponse.playerStatusLines[1].getClaim() != null) return false;
             if (pollresponse.playerStatusLines[2].getClaim() != null) return false;
+            response = ge.Poll(playersAccessTokens["Alice"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar) return false;
+            if (pollresponse.awaitingActionFromPlayerName != "Connie") return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[0].getClaim() != new pokerDiceHand("99TJQ")) return false;
+            if (pollresponse.playerStatusLines[1].getClaim() != null) return false;
+            if (pollresponse.playerStatusLines[2].getClaim() != null) return false;
 
 
 

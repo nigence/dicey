@@ -38,9 +38,15 @@ namespace ld
             return 0;
         }
 
+        public void SetHandClaim(pokerDiceHand hand)
+        {
+            claim = hand;
+        }
+
         private static int nextAccessTokenNumber = 1;
         private string identifier;
         private string name;
         private int runningOrder;
+        private pokerDiceHand claim;
     }
 }
