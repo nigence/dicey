@@ -95,9 +95,12 @@ namespace ld
             {
                 returnMessage.SetHandToView(associatedGame.GetActualHand());
             }
-
-
             return returnMessage;
+        }
+
+        public void DeclareHand(string accessToken, pokerDiceHand hand)
+        {
+
         }
 
         private game FindGameByName( string gameName)

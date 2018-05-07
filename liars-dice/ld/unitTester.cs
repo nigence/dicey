@@ -556,6 +556,26 @@ namespace ld
             if (!pollresponse.HasHandToView()) return false;
             if (pollresponse.GetNamedPlayersHand() != AJT99) return false;
 
+            //HE DECLARES A LOWER HAND (QJT99  - I.E. NOT LIEING)
+            //bca
+            //CONNIE AND ALICE CAN SEE THAT IT IS CONNIES TURN
+            //SHE MUST DECIDE WHETHER OR NOT TO ACCEPT THE HAND
+            //EVERYONE CAN SEE BOB'S CLAIM FOR THE HAND
+            ge.DeclareHand(playersAccessTokens["Bob"], new pokerDiceHand("QJT99"));
+            response = ge.Poll(playersAccessTokens["Connie"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar) return false;
+            if (pollresponse.awaitingActionFromPlayerName != "Connie") return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[0].getClaim() != new pokerDiceHand("99TJQ")) return false;
+            if (pollresponse.playerStatusLines[1].getClaim() != null) return false;
+            if (pollresponse.playerStatusLines[2].getClaim() != null) return false;
+
+
+
 
             return true;
 

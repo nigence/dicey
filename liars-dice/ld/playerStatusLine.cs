@@ -8,9 +8,12 @@ namespace ld
 {
     class playerStatusLine
     {
-        public playerStatusLine(string name)
+        public playerStatusLine(string name, bool handClaimMade = false, pokerDiceHand handClaim = null)
         {
             mName = name;
+            mClaim = null;
+            if (handClaimMade)
+                mClaim = handClaim;
         }
 
         public string GetName()
@@ -18,6 +21,12 @@ namespace ld
             return mName;
         }
 
+        public pokerDiceHand getClaim()
+        {
+            return mClaim;
+        }
+
         string mName;
+        pokerDiceHand mClaim;
     }
 }
