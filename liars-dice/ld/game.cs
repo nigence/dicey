@@ -18,7 +18,6 @@ namespace ld
             mAdministrator = administrator;
             status = gameStatus.playersJoining;
             reroller = new pokerDiceHandReroller(dieRoller);
-            currentHandClaim = null;
             currentActualHand = reroller.GetNewHand();
         }
 
@@ -154,6 +153,19 @@ namespace ld
             status = gameStatus.awaitingPlayerDecisionAcceptOrCallLiar;
         }
 
+        public void AcceptHand(string playerId)
+        {
+            player a = GetPlayerById(playerId);
+            string aName = a.GetName();
+            string bName = this.GetPlayerNameWithActionAwaited();
+            if (aName != bName) return;
+            if (this.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar) return;
+
+            status = gameStatus.awaitingPlayerToChooseDiceToReRollOrNone;
+        }
+
+
+
         private void MoveTurnToNextPlayer()
         {
             playerToActIndex++;
@@ -167,7 +179,6 @@ namespace ld
         private List<player> playersList; //includes administrator
         private player mAdministrator;
         private int playerToActIndex;
-        private pokerDiceHand currentHandClaim;
         private pokerDiceHand currentActualHand;
         private pokerDiceHandReroller reroller;
     }

@@ -585,6 +585,26 @@ namespace ld
             if (pollresponse.playerStatusLines[1].getClaim() != null) return false;
             if (pollresponse.playerStatusLines[2].getClaim() != null) return false;
 
+            //CONNIE DECIDES TO ACCEPT THE HAND
+            //SHE SEES SHE GOT AJT99
+            //SHE MUST DECIDE HOW MANY TO ROLL AGAIN
+            ge.AcceptHand(playersAccessTokens["Connie"]);
+            response = ge.Poll(playersAccessTokens["Connie"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.GetNamedPlayersHand() != AJT99) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone) return false;
+            if (pollresponse.awaitingActionFromPlayerName != "Connie") return false;
+
+
+
+            //if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            //if (pollresponse.playerStatusLines[1].GetName() != "Connie") return false;
+            //if (pollresponse.playerStatusLines[2].GetName() != "Alice") return false;
+            //if (pollresponse.playerStatusLines[0].getClaim() != new pokerDiceHand("99TJQ")) return false;
+            //if (pollresponse.playerStatusLines[1].getClaim() != null) return false;
+            //if (pollresponse.playerStatusLines[2].getClaim() != null) return false;
+
 
 
 

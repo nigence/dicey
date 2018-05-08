@@ -106,6 +106,14 @@ namespace ld
             associatedGame.DeclareHand(accessToken, hand);
         }
 
+        public void AcceptHand(string accessToken)
+        {
+            game associatedGame = FindGameByPlayer(accessToken);
+            if (associatedGame == null)
+                return;
+            associatedGame.AcceptHand(accessToken);
+        }
+
         private game FindGameByName( string gameName)
         {
             foreach (var g in gamesList)
