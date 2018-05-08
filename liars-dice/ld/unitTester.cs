@@ -603,6 +603,25 @@ namespace ld
             if (pollresponse.HasHandToView()) return false;
             if (pollresponse.GetNamedPlayersHand() != null) return false;
 
+            //CONNIE DECIDES TO REROLL THE JACK AND THE TEN
+            ge.ReRoll(playersAccessTokens["Connie"], "JT");
+
+            //ALICE CAN SEE THAT CONNIE REROLLS 2 DICE
+            //AND THAT CONNIE MUST NOW DECIDE A HAND RANK TO CLAIM
+            response = ge.Poll(playersAccessTokens["Alice"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.GetNamedPlayersHand() != null) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerToClaimHandRank) return false;
+            if (pollresponse.awaitingActionFromPlayerName != "Connie") return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[0].GetRerollDiceCount() != null) return false;
+            if (pollresponse.playerStatusLines[1].GetRerollDiceCount() != 2) return false;
+            if (pollresponse.playerStatusLines[2].GetRerollDiceCount() != null) return false;
+
+
 
 
             //if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;

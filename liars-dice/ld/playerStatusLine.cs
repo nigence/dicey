@@ -26,6 +26,11 @@ namespace ld
             return mClaim;
         }
 
+        public int? GetRerollDiceCount()
+        {
+            return null;
+        }
+
         string mName;
         pokerDiceHand mClaim;
     }

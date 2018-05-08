@@ -114,6 +114,11 @@ namespace ld
             associatedGame.AcceptHand(accessToken);
         }
 
+        public void ReRoll(string accessToken, string facesToReRoll)
+        {
+
+        }
+
         private game FindGameByName( string gameName)
         {
             foreach (var g in gamesList)
