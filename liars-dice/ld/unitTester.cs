@@ -596,6 +596,13 @@ namespace ld
             if (pollresponse.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone) return false;
             if (pollresponse.awaitingActionFromPlayerName != "Connie") return false;
 
+            //BOB CANT SEE THE HAND ANYMORE
+            response = ge.Poll(playersAccessTokens["Bob"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.HasHandToView()) return false;
+            if (pollresponse.GetNamedPlayersHand() != null) return false;
+
 
 
             //if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
