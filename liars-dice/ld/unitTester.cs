@@ -19,7 +19,7 @@ namespace ld
         {
             Console.WriteLine("...runAll()");
             bool allOkay = false;
-            for ( int i = 0; i < 1; i++ )
+            for (int i = 0; i < 1; i++)
             {
                 if (!PokerDiceHandEqualityOperatorTestPassed()) break;
                 if (!permutationsCalculatorTestPassed()) break;
@@ -29,7 +29,7 @@ namespace ld
                 if (!GameEngineSampleGameTestPassed()) break;
                 allOkay = true;
             }
-            if(!allOkay)
+            if (!allOkay)
                 Console.WriteLine("......Fail");
             else
                 Console.WriteLine("......Pass");
@@ -93,9 +93,9 @@ namespace ld
             int size = handRankArray.Length;
             // Console.WriteLine("......handRankArray.Length() is {0}", size); //This MUST be 252
             bool testFailSeen = false;
-            for (int i = 0; i<size; i++)
+            for (int i = 0; i < size; i++)
             {
-                for (int j = 0; j<size; j++)
+                for (int j = 0; j < size; j++)
                 {
                     pokerDiceHand a = handRankArray[i];
                     pokerDiceHand b = handRankArray[j];
@@ -431,6 +431,23 @@ namespace ld
                 return false;
         }
 
+        private bool playerHasHand(string playerName, pokerDiceHand hand, gameEngine ge, Dictionary<string, string> playersAccessTokens)
+        {
+            gameEngineReturnMessage response = ge.Poll(playersAccessTokens[playerName]);
+            pollResponse pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            return (pollresponse.GetNamedPlayersHand() == hand);
+        }
+
+        private bool playerSeesGameStatus(string playerName, gameStatus expectedStatus, string playerNameWithActionAwaited, gameEngine ge, Dictionary<string, string> playersAccessTokens)
+        {
+            var response = ge.Poll(playersAccessTokens[playerName]);
+            pollResponse pollresponse = response as pollResponse;
+            if (pollresponse.status != expectedStatus) return false;
+            if (pollresponse.awaitingActionFromPlayerName != playerNameWithActionAwaited) return false;
+            return true;
+        }
+
         private bool GameEngineSampleGameTestPassed()
         {
             gameEngine ge = new gameEngine(pdrtm);
@@ -552,9 +569,7 @@ namespace ld
             if (pollresponse.awaitingActionFromPlayerName != "Bob") return false;
 
             //HIS HAND IS AJT99
-            pokerDiceHand AJT99 = new pokerDiceHand("AJT99");
-            if (!pollresponse.HasHandToView()) return false;
-            if (pollresponse.GetNamedPlayersHand() != AJT99) return false;
+            if (!playerHasHand("Bob", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
 
             //HE DECLARES A LOWER HAND (QJT99  - I.E. NOT LIEING)
             //bca
@@ -589,12 +604,9 @@ namespace ld
             //SHE SEES SHE GOT AJT99
             //SHE MUST DECIDE HOW MANY TO ROLL AGAIN
             ge.AcceptHand(playersAccessTokens["Connie"]);
-            response = ge.Poll(playersAccessTokens["Connie"]);
-            pollresponse = response as pollResponse;
-            if (pollresponse == null) return false;
-            if (pollresponse.GetNamedPlayersHand() != AJT99) return false;
-            if (pollresponse.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone) return false;
-            if (pollresponse.awaitingActionFromPlayerName != "Connie") return false;
+            if (!playerHasHand("Connie", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
+            if (!playerSeesGameStatus("Connie", gameStatus.awaitingPlayerToChooseDiceToReRollOrNone, "Connie", ge, playersAccessTokens))
+                return false;
 
             //BOB CANT SEE THE HAND ANYMORE
             response = ge.Poll(playersAccessTokens["Bob"]);
@@ -605,6 +617,10 @@ namespace ld
 
             //CONNIE DECIDES TO REROLL THE JACK AND THE TEN
             ge.ReRoll(playersAccessTokens["Connie"], "JT");
+
+            //SHE GETS A JACK AGAIN AND A NINE
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
 
             //ALICE CAN SEE THAT CONNIE REROLLS 2 DICE
             //AND THAT CONNIE MUST NOW DECIDE A HAND RANK TO CLAIM
@@ -621,6 +637,7 @@ namespace ld
             if (pollresponse.playerStatusLines[1].GetRerollDiceCount() != 2) return false;
             if (pollresponse.playerStatusLines[2].GetRerollDiceCount() != null) return false;
 
+            //NEW HAND SEEN BY CONNIE IS QJ999
 
 
 
