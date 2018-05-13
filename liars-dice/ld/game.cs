@@ -142,40 +142,38 @@ namespace ld
 
         public void DeclareHand(string playerId, pokerDiceHand hand)
         {
-            player a = GetPlayerById(playerId);
-            string aName = a.GetName();
-            string bName = this.GetPlayerNameWithActionAwaited();
-            if (aName != bName) return;
-            if (this.status != gameStatus.awaitingPlayerToClaimHandRank) return;
-
-            a.SetHandClaim(hand);
+            player p = null;
+            if ((!ConfirmPlayerIsWithActionAwaited(playerId, ref p)) ||
+                (this.status != gameStatus.awaitingPlayerToClaimHandRank)) return;
+            p.SetHandClaim(hand);
             MoveTurnToNextPlayer();
             status = gameStatus.awaitingPlayerDecisionAcceptOrCallLiar;
         }
 
         public void AcceptHand(string playerId)
         {
-            player a = GetPlayerById(playerId);
-            string aName = a.GetName();
-            string bName = this.GetPlayerNameWithActionAwaited();
-            if (aName != bName) return;
-            if (this.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar) return;
-
+            player p = null;
+            if ((!ConfirmPlayerIsWithActionAwaited(playerId, ref p)) ||
+                (this.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar)) return;
             status = gameStatus.awaitingPlayerToChooseDiceToReRollOrNone;
         }
 
         public void ReRoll(string playerId, string facesToReRoll)
         {
-            player a = GetPlayerById(playerId);
-            string aName = a.GetName();
-            string bName = this.GetPlayerNameWithActionAwaited();
-            if (aName != bName) return;
-            if (this.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone) return;
-
+            player p = null;
+            if ((!ConfirmPlayerIsWithActionAwaited(playerId, ref p)) || 
+                (this.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone)) return;
             status = gameStatus.awaitingPlayerToClaimHandRank;
-            a.SetRerollCount(facesToReRoll.Length);
+            p.SetRerollCount(facesToReRoll.Length);
         }
 
+        private bool ConfirmPlayerIsWithActionAwaited(string playerId, ref player p)
+        {
+            p = GetPlayerById(playerId);
+            string pName = p.GetName();
+            string xName = this.GetPlayerNameWithActionAwaited();
+            return (pName == xName);
+        }
 
         private void MoveTurnToNextPlayer()
         {
