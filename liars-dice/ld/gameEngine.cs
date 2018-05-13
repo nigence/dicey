@@ -71,7 +71,7 @@ namespace ld
             return returnMsg;
         }
 
-        public gameEngineReturnMessage  Poll(string accessToken)
+        public gameEngineReturnMessage Poll(string accessToken)
         {
             pollResponse returnMessage = new pollResponse();
 
@@ -84,8 +84,12 @@ namespace ld
 
             List<string> names = associatedGame.GetPlayersNames();
 
-            foreach(var n in names)
-                returnMessage.playerStatusLines.Add(new playerStatusLine(n));
+            foreach (var n in names)
+            {
+                int? rerollCount = associatedGame.GetPlayerByName(n).GetRerollCount();
+                returnMessage.playerStatusLines.Add(new playerStatusLine(n, false, null, rerollCount));
+            }
+
 
             returnMessage.awaitingActionFromPlayerName = associatedGame.GetPlayerNameWithActionAwaited();
 
@@ -116,7 +120,10 @@ namespace ld
 
         public void ReRoll(string accessToken, string facesToReRoll)
         {
-
+            game associatedGame = FindGameByPlayer(accessToken);
+            if (associatedGame == null)
+                return;
+            associatedGame.ReRoll(accessToken, facesToReRoll);
         }
 
         private game FindGameByName( string gameName)

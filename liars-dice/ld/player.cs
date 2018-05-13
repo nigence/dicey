@@ -43,10 +43,21 @@ namespace ld
             claim = hand;
         }
 
+        public void SetRerollCount(int? count)
+        {
+            rerollCount = count;
+        }
+
+        public int? GetRerollCount()
+        {
+            return rerollCount;
+        }
+
         private static int nextAccessTokenNumber = 1;
         private string identifier;
         private string name;
         private int runningOrder;
         private pokerDiceHand claim;
+        private int? rerollCount;
     }
 }

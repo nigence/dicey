@@ -164,6 +164,17 @@ namespace ld
             status = gameStatus.awaitingPlayerToChooseDiceToReRollOrNone;
         }
 
+        public void ReRoll(string playerId, string facesToReRoll)
+        {
+            player a = GetPlayerById(playerId);
+            string aName = a.GetName();
+            string bName = this.GetPlayerNameWithActionAwaited();
+            if (aName != bName) return;
+            if (this.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone) return;
+
+            status = gameStatus.awaitingPlayerToClaimHandRank;
+            a.SetRerollCount(facesToReRoll.Length);
+        }
 
 
         private void MoveTurnToNextPlayer()
