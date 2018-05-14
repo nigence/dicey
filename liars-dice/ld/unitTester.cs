@@ -457,7 +457,7 @@ namespace ld
                 }
                 else
                 {
-                    if (!playerHasHand(playerName, null, ge, playersAccessTokens))
+                    if (!playerHasHand(playerDetails.Key, null, ge, playersAccessTokens))
                     {
                         return false;
                     }
@@ -667,18 +667,8 @@ namespace ld
             if (pollresponse.playerStatusLines[1].GetRerollDiceCount() != 2) return false;
             if (pollresponse.playerStatusLines[2].GetRerollDiceCount() != null) return false;
 
-            //NEW HAND SEEN BY CONNIE IS QJ999
-
-
-
-            //if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
-            //if (pollresponse.playerStatusLines[1].GetName() != "Connie") return false;
-            //if (pollresponse.playerStatusLines[2].GetName() != "Alice") return false;
-            //if (pollresponse.playerStatusLines[0].getClaim() != new pokerDiceHand("99TJQ")) return false;
-            //if (pollresponse.playerStatusLines[1].getClaim() != null) return false;
-            //if (pollresponse.playerStatusLines[2].getClaim() != null) return false;
-
-
+            //NEW HAND SEEN BY CONNIE IS AJ999
+            if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("AJ999"), ge, playersAccessTokens)) return false;
 
 
             return true;

@@ -87,15 +87,20 @@ namespace ld
             foreach (var n in names)
             {
                 int? rerollCount = associatedGame.GetPlayerByName(n).GetRerollCount();
-                returnMessage.playerStatusLines.Add(new playerStatusLine(n, false, null, rerollCount));
+                pokerDiceHand handClaim = associatedGame.GetPlayerByName(n).GetHandClaim();
+                bool handClaimMade = handClaim != null;
+                returnMessage.playerStatusLines.Add(new playerStatusLine(n, handClaimMade, handClaim, rerollCount));
             }
 
 
             returnMessage.awaitingActionFromPlayerName = associatedGame.GetPlayerNameWithActionAwaited();
 
             //Decide whether or not to reveal actual hand to the calling player
-            if ( (associatedGame.GetPlayerById(accessToken).GetName() == associatedGame.GetPlayerNameWithActionAwaited())
-                && (associatedGame.GetStatus() == gameStatus.awaitingPlayerToClaimHandRank))
+            if ((associatedGame.GetPlayerById(accessToken).GetName() == associatedGame.GetPlayerNameWithActionAwaited())
+                && 
+                ((associatedGame.GetStatus() == gameStatus.awaitingPlayerToClaimHandRank)
+                ||  (associatedGame.GetStatus() == gameStatus.awaitingPlayerToChooseDiceToReRollOrNone))
+                )
             {
                 returnMessage.SetHandToView(associatedGame.GetActualHand());
             }

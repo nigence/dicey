@@ -14,6 +14,7 @@ namespace ld
             string accessToken = "access-token-" + nextAccessTokenNumber.ToString();
             identifier = accessToken;
             nextAccessTokenNumber++;
+            claim = null;
         }
 
         public string GetId()
@@ -41,6 +42,11 @@ namespace ld
         public void SetHandClaim(pokerDiceHand hand)
         {
             claim = hand;
+        }
+
+        public pokerDiceHand GetHandClaim()
+        {
+            return claim;
         }
 
         public void SetRerollCount(int? count)
