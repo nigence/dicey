@@ -9,27 +9,14 @@ namespace ld
 
         public pokerDiceHand(String fiveFacesString)
         {
-            indexToFace.Add(0, "9");
-            indexToFace.Add(1, "T");
-            indexToFace.Add(2, "J");
-            indexToFace.Add(3, "Q");
-            indexToFace.Add(4, "K");
-            indexToFace.Add(5, "A");
-            faceToIndex.Add("9", 0);
-            faceToIndex.Add("T", 1);
-            faceToIndex.Add("J", 2);
-            faceToIndex.Add("Q", 3);
-            faceToIndex.Add("K", 4);
-            faceToIndex.Add("A", 5);
+            int[] facesCounts = new int[FacesCount()];
 
-            int[] facesCounts = new int[indexToFace.Count];
-
-            for (int j=indexToFace.Count-1; j>-1; j--)
+            for (int j= FacesCount() - 1; j>-1; j--)
             {
-                countFaces(fiveFacesString, indexToFace[j], ref facesCounts[j]);
+                countFaces(fiveFacesString, Face(j), ref facesCounts[j]);
 
                 for (int i = 0; i < facesCounts[j]; i++)
-                    faces += indexToFace[j];
+                    faces += Face(j);
             }
 
             SetHashCode(facesCounts);
@@ -167,10 +154,10 @@ namespace ld
                 case 2:
                     handKind = (fc[1] == 2 ? HandKind.twoPairs : HandKind.pair); break;
                 case 1:
-                    if (unsortedFaceCounts[faceToIndex["T"]] == 0 || 
-                        unsortedFaceCounts[faceToIndex["J"]] == 0 ||
-                        unsortedFaceCounts[faceToIndex["Q"]] == 0 ||
-                        unsortedFaceCounts[faceToIndex["K"]] == 0
+                    if (unsortedFaceCounts[ Index("T")] == 0 || 
+                        unsortedFaceCounts[ Index("J")] == 0 ||
+                        unsortedFaceCounts[ Index("Q")] == 0 ||
+                        unsortedFaceCounts[ Index("K")] == 0
                         )
                         handKind = HandKind.none;
                     else
@@ -223,7 +210,7 @@ namespace ld
 
         private int FindRepeatedFace(int[] facesCounts,  int frequency, int? excludeA=null, int? excludeB=null )
         {
-            for (int j = indexToFace.Count - 1; j > -1; j--)
+            for (int j = FacesCount() - 1; j > -1; j--)
             {
                 if(facesCounts[j]==frequency)
                 {
@@ -244,7 +231,41 @@ namespace ld
         private int? primaryFace;
         private int? secondaryFace;
 
-        private Dictionary<int, string> indexToFace = new Dictionary<int, string>();
-        private Dictionary<string, int> faceToIndex = new Dictionary<string, int>();
+        private static string Face(int facenum)
+        {
+            string retval = "";
+            switch(facenum)
+            {
+                case 0: retval += "9"; break;
+                case 1: retval += "T"; break;
+                case 2: retval += "J"; break;
+                case 3: retval += "Q"; break;
+                case 4: retval += "K"; break;
+                case 5: retval += "A"; break;
+            }
+            return retval;
+        }
+
+        private static int Index(string face)
+        {
+            int i = 0;
+            string s = "";
+            do
+            {
+                s = Face(i);
+                if (s == face)
+                    return i;
+                i++;
+            }
+            while (s.Length > 0);
+
+            return -1;
+        }
+
+        private static int FacesCount()
+        {
+            return (Index("A")+1);
+        }
+
     }
 }
