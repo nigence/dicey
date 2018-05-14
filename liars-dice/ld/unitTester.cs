@@ -436,8 +436,36 @@ namespace ld
             gameEngineReturnMessage response = ge.Poll(playersAccessTokens[playerName]);
             pollResponse pollresponse = response as pollResponse;
             if (pollresponse == null) return false;
+
+            if (hand == null)
+            {
+                if (pollresponse.HasHandToView()) return false;
+            }
             return (pollresponse.GetNamedPlayersHand() == hand);
         }
+
+        private bool playerHasHandOthersCantSee(string playerName, pokerDiceHand hand, gameEngine ge, Dictionary<string, string> playersAccessTokens)
+        {
+            foreach (var playerDetails in playersAccessTokens)
+            {
+                if (playerDetails.Key == playerName)
+                {
+                    if (!playerHasHand(playerName, hand, ge, playersAccessTokens))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (!playerHasHand(playerName, null, ge, playersAccessTokens))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
 
         private bool playerSeesGameStatus(string playerName, gameStatus expectedStatus, string playerNameWithActionAwaited, gameEngine ge, Dictionary<string, string> playersAccessTokens)
         {
@@ -614,6 +642,8 @@ namespace ld
             if (pollresponse == null) return false;
             if (pollresponse.HasHandToView()) return false;
             if (pollresponse.GetNamedPlayersHand() != null) return false;
+            if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
+
 
             //CONNIE DECIDES TO REROLL THE JACK AND THE TEN
             ge.ReRoll(playersAccessTokens["Connie"], "JT");

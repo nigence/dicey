@@ -73,10 +73,12 @@ namespace ld
 
         public static bool operator == (pokerDiceHand lhs, pokerDiceHand rhs)
         {
+            if (ReferenceEquals(lhs, null) && ReferenceEquals(rhs, null))
+                return true;
             if (ReferenceEquals(lhs, null))
-                return true;
+                return false;
             if (ReferenceEquals(rhs, null))
-                return true;
+                return false;
             if (ReferenceEquals(lhs, rhs))
                 return true;
             if (lhs.faces == rhs.faces)
