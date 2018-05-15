@@ -6,6 +6,19 @@ namespace ld
 {
     public class pokerDiceHand
     {
+        public static bool isValidFacesString(string facesString)
+        {
+            string s = string.Empty;
+            foreach(char c in facesString)
+            {
+                s = string.Empty;
+                s += c;
+                int i = Index(s);
+                if (i < 0)
+                    return false;
+            }
+            return true;
+        }
 
         public pokerDiceHand(String fiveFacesString)
         {

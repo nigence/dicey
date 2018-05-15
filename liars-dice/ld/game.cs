@@ -165,6 +165,10 @@ namespace ld
                 (this.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone)) return;
             status = gameStatus.awaitingPlayerToClaimHandRank;
             p.SetRerollCount(facesToReRoll.Length);
+
+
+            pokerDiceHand newHand = reroller.Reroll(currentActualHand, facesToReRoll);
+            currentActualHand = newHand;
         }
 
         private bool ConfirmPlayerIsWithActionAwaited(string playerId, ref player p)

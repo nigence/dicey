@@ -24,7 +24,9 @@ namespace ld
                 if (!PokerDiceHandEqualityOperatorTestPassed()) break;
                 if (!permutationsCalculatorTestPassed()) break;
                 if (!handKindsIdentifyTestPassed()) break;
+                if (!pokerDiceHandStringValidatorTestPassed()) break;
                 if (!PokerDiceHandGreaterLessThanOperatorsTestPassed()) break;
+                if (!rerollerFacesRemainderTestPassed()) break;
                 if (!GameEngineNewGameTestPassed()) break;
                 if (!GameEngineSampleGameTestPassed()) break;
                 allOkay = true;
@@ -88,6 +90,28 @@ namespace ld
             return allOkay;
         }
 
+        private bool pokerDiceHandStringValidatorTestPassed()
+        {
+            bool allOk = false;
+            for (int i = 0; i < 1; i++)
+            {
+                if (!pokerDiceHand.isValidFacesString("AAAAA")) break;
+                if (!pokerDiceHand.isValidFacesString("AKQJT9")) break;
+                if (!pokerDiceHand.isValidFacesString("9999A")) break;
+                if (!pokerDiceHand.isValidFacesString("KK")) break;
+                if (!pokerDiceHand.isValidFacesString("JAJAJAJAJAJAJAJAJAJAJAJA9")) break;
+                if (!pokerDiceHand.isValidFacesString("")) break;
+                if (pokerDiceHand.isValidFacesString("AFAAA")) break;
+                if (pokerDiceHand.isValidFacesString("AAA A")) break;
+                if (pokerDiceHand.isValidFacesString("AAA-A")) break;
+                if (pokerDiceHand.isValidFacesString("AAA%A")) break;
+                if (pokerDiceHand.isValidFacesString(".")) break;
+
+                allOk = true;
+            }
+            return allOk;
+        }
+
         private bool PokerDiceHandGreaterLessThanOperatorsTestPassed()
         {
             int size = handRankArray.Length;
@@ -121,6 +145,21 @@ namespace ld
                 }
             }
             return true;
+        }
+
+        private bool rerollerFacesRemainderTestPassed()
+        {
+            bool allOk = false;
+            for (int i = 1; i == 1; i++)
+            {
+                bool thisOk = false;
+                string remainder = pokerDiceHandReroller.Remainder("9TJQK", "TQ", ref thisOk);
+                if (!thisOk) break;
+                if (remainder != "9JK") break;
+
+                allOk = true;
+            }
+            return allOk;
         }
 
         private bool permutationsCalculatorTestPassed()
