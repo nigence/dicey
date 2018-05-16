@@ -157,6 +157,40 @@ namespace ld
                 if (!thisOk) break;
                 if (remainder != "9JK") break;
 
+                remainder = pokerDiceHandReroller.Remainder("AAAAA", "A", ref thisOk);
+                if (!thisOk) break;
+                if (remainder != "AAAA") break;
+
+                remainder = pokerDiceHandReroller.Remainder("AAXAA", "A", ref thisOk);
+                if (thisOk) break;
+
+                remainder = pokerDiceHandReroller.Remainder("AKAKAKAKAKA", "AKAKAKAKAK", ref thisOk);
+                if (!thisOk) break;
+                if (remainder != "A") break;
+
+                remainder = pokerDiceHandReroller.Remainder("AKAKAKAKAKA", "KKKKKAAAAA", ref thisOk);
+                if (!thisOk) break;
+                if (remainder != "A") break;
+
+                remainder = pokerDiceHandReroller.Remainder("AKAKAKAKAKA", "KKKKKAAAAAA", ref thisOk);
+                if (!thisOk) break;
+                if (remainder != "") break;
+
+                remainder = pokerDiceHandReroller.Remainder("AKAKAKAKAKA", "KKKKKAAAAAAA", ref thisOk);
+                if (thisOk) break;
+
+                remainder = pokerDiceHandReroller.Remainder("", "9", ref thisOk);
+                if (thisOk) break;
+
+                remainder = pokerDiceHandReroller.Remainder("", "", ref thisOk);
+                if (!thisOk) break;
+                if (remainder != "") break;
+
+                remainder = pokerDiceHandReroller.Remainder("J9", "", ref thisOk);
+                if (!thisOk) break;
+                if (remainder != "J9") break;
+
+
                 allOk = true;
             }
             return allOk;
@@ -685,11 +719,11 @@ namespace ld
 
 
             //CONNIE DECIDES TO REROLL THE JACK AND THE TEN
-            ge.ReRoll(playersAccessTokens["Connie"], "JT");
-
             //SHE GETS A JACK AGAIN AND A NINE
             pdrtm.EnqueueRoll(pokerDieFace.J);
             pdrtm.EnqueueRoll(pokerDieFace.N);
+            ge.ReRoll(playersAccessTokens["Connie"], "JT");
+
 
             //ALICE CAN SEE THAT CONNIE REROLLS 2 DICE
             //AND THAT CONNIE MUST NOW DECIDE A HAND RANK TO CLAIM

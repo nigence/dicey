@@ -166,7 +166,6 @@ namespace ld
             status = gameStatus.awaitingPlayerToClaimHandRank;
             p.SetRerollCount(facesToReRoll.Length);
 
-
             pokerDiceHand newHand = reroller.Reroll(currentActualHand, facesToReRoll);
             currentActualHand = newHand;
         }

@@ -15,9 +15,18 @@ namespace ld
 
         public pokerDiceHand Reroll(pokerDiceHand oldHand, string facesToReRoll)
         {
-            //getFacesOrderedByRank
-
-            pokerDiceHand pdh = new pokerDiceHand("99999");
+            string oldFaces = oldHand.getFacesOrderedByRank();
+            bool remainderFoundOkay = false;
+            string retainedFaces = Remainder(oldFaces, facesToReRoll, ref remainderFoundOkay);
+            if (!remainderFoundOkay) return new pokerDiceHand("xxxxx");
+            string newFaces = retainedFaces;
+            string newRoll;
+            for(int i = 0; i<facesToReRoll.Length; i++)
+            {
+                newRoll = mDieRoller.Roll(showAsString.y);
+                newFaces += newRoll;
+            }
+            pokerDiceHand pdh = new pokerDiceHand(newFaces);
             return pdh;
         }
 
