@@ -170,6 +170,39 @@ namespace ld
             currentActualHand = newHand;
         }
 
+        public void CallLiar(string accessToken)
+        {
+            player p = null;
+            if ((!ConfirmPlayerIsWithActionAwaited(accessToken, ref p)) ||
+                (this.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar)) return;
+
+            if (GetPreviousPlayerHandClaim() > currentActualHand)
+                ActionPreviousPlayerIsLiar();
+            else
+                ActionIncorrectLiarCall();
+
+
+            status = gameStatus.awaitingPlayerToClaimHandRank;
+
+
+        }
+
+        private pokerDiceHand GetPreviousPlayerHandClaim()
+        {
+            return new pokerDiceHand("99999");
+        }
+
+        private void ActionPreviousPlayerIsLiar()
+        {
+
+        }
+
+        private void ActionIncorrectLiarCall()
+        {
+
+        }
+
+
         private bool ConfirmPlayerIsWithActionAwaited(string playerId, ref player p)
         {
             p = GetPlayerById(playerId);

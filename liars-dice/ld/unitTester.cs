@@ -538,7 +538,21 @@ namespace ld
             }
             return true;
         }
-
+        private bool everyoneCanSeePlayersClaim(string playersName, pokerDiceHand playersClaim, gameEngine ge, Dictionary<string, string> playersAccessTokens)
+        {
+            foreach (var playerDetails in playersAccessTokens)
+            {
+                var pr = ge.Poll(playerDetails.Value);
+                pollResponse pollresponse = pr as pollResponse;
+                if (pollresponse == null) return false;
+                foreach( var psl in pollresponse.playerStatusLines)
+                {
+                    if ((psl.GetName() == playersName) && psl.getClaim() != playersClaim)
+                        return false;
+                }
+            }
+            return true;
+        }
 
         private bool playerSeesGameStatus(string playerName, gameStatus expectedStatus, string playerNameWithActionAwaited, gameEngine ge, Dictionary<string, string> playersAccessTokens)
         {
@@ -547,6 +561,21 @@ namespace ld
             if (pollresponse.status != expectedStatus) return false;
             if (pollresponse.awaitingActionFromPlayerName != playerNameWithActionAwaited) return false;
             return true;
+        }
+
+        private bool allPlayersSeeGameStatus(gameStatus expectedStatus, string playerNameWithActionAwaited, gameEngine ge, Dictionary<string, string> playersAccessTokens)
+        {
+            foreach(var p in playersAccessTokens)
+            {
+                if (!playerSeesGameStatus(p.Key, expectedStatus, playerNameWithActionAwaited, ge, playersAccessTokens))
+                    return false;
+            }
+            return true;
+        }
+
+        private bool VerifyLivesRemaining(string playerName, int expectedLivesRemaining)
+        {
+            return false;
         }
 
         private bool GameEngineSampleGameTestPassed()
@@ -673,7 +702,6 @@ namespace ld
             if (!playerHasHand("Bob", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
 
             //HE DECLARES A LOWER HAND (QJT99  - I.E. NOT LIEING)
-            //bca
             //CONNIE AND ALICE CAN SEE THAT IT IS CONNIES TURN
             //SHE MUST DECIDE WHETHER OR NOT TO ACCEPT THE HAND
             //EVERYONE CAN SEE BOB'S CLAIM FOR THE HAND
@@ -742,6 +770,35 @@ namespace ld
 
             //NEW HAND SEEN BY CONNIE IS AJ999
             if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("AJ999"), ge, playersAccessTokens)) return false;
+
+            //SHE TRIES TO PASS IT OFF AS Q9999
+            ge.DeclareHand(playersAccessTokens["Connie"], new pokerDiceHand("Q9999"));
+            if (!everyoneCanSeePlayersClaim("Connie", new pokerDiceHand("Q9999"), ge, playersAccessTokens))return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Alice", ge, playersAccessTokens)) return false;
+
+
+            //ALICE CALLS LIAR
+            //ALICE IS CORRECT
+            //CONNIE WAS LYING
+            //CONNIE LOSES 1 LIFE
+            //LIAR CONNIE RECEIVES A FRESH SET OF DICE (KQQTT) AND MUST CALL AGAIN
+            pdrtm.EnqueueRoll(pokerDieFace.T);
+            pdrtm.EnqueueRoll(pokerDieFace.T);
+            pdrtm.EnqueueRoll(pokerDieFace.K);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            ge.CallLiar(playersAccessTokens["Alice"]);
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Connie", ge, playersAccessTokens)) return false;
+            if (!VerifyLivesRemaining("Connie", 2)) return false;
+
+
+
+
+
+
+
+
+
 
 
             return true;

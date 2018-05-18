@@ -131,6 +131,14 @@ namespace ld
             associatedGame.ReRoll(accessToken, facesToReRoll);
         }
 
+        public void CallLiar(string accessToken)
+        {
+            game associatedGame = FindGameByPlayer(accessToken);
+            if (associatedGame == null)
+                return;
+            associatedGame.CallLiar(accessToken);
+        }
+
         private game FindGameByName( string gameName)
         {
             foreach (var g in gamesList)
