@@ -14,10 +14,10 @@ namespace ld
             mRoller = roller;
         }
 
-        public gameEngineReturnMessage CreateNewGame(string adminsName)
+        public gameEngineReturnMessage CreateNewGame(string adminsName, int initialLives)
         {
-            player administrator = new player(adminsName);
-            game newGame = new game(administrator, mRoller);
+            player administrator = new player(adminsName, initialLives);
+            game newGame = new game(administrator, mRoller, initialLives);
             gamesList.Add(newGame);
 
             newGameDetails returnMsg = new newGameDetails(true, administrator.GetId(), newGame.GetId());
@@ -31,7 +31,7 @@ namespace ld
             if (g == null || !g.isOpenToNewPlayers())
                 return new playerRegistration(false, "");
 
-            player p = new player(playerName);
+            player p = new player(playerName, g.GetInitialLivesCount());
             g.Join(p);
 
             playerRegistration returnMsg = new playerRegistration(true, p.GetId());
@@ -89,7 +89,8 @@ namespace ld
                 int? rerollCount = associatedGame.GetPlayerByName(n).GetRerollCount();
                 pokerDiceHand handClaim = associatedGame.GetPlayerByName(n).GetHandClaim();
                 bool handClaimMade = handClaim != null;
-                returnMessage.playerStatusLines.Add(new playerStatusLine(n, handClaimMade, handClaim, rerollCount));
+                int livesLeft = associatedGame.GetPlayerByName(n).GetLivesRemaining();
+                returnMessage.playerStatusLines.Add(new playerStatusLine(n, livesLeft, handClaimMade ,handClaim, rerollCount));
             }
 
 

@@ -8,7 +8,7 @@ namespace ld
 {
     class game
     {
-        public game(player administrator, pokerDieRoller dieRoller)
+        public game(player administrator, pokerDieRoller dieRoller, int initialLivesCount)
         {
             string id = "game-identifier-" + nextIdentifierNumber.ToString();
             identifier = id;
@@ -19,6 +19,7 @@ namespace ld
             status = gameStatus.playersJoining;
             reroller = new pokerDiceHandReroller(dieRoller);
             currentActualHand = reroller.GetNewHand();
+            mInitialLivesCount = initialLivesCount;
         }
 
         public string GetId()
@@ -187,6 +188,11 @@ namespace ld
 
         }
 
+        public int GetInitialLivesCount()
+        {
+            return mInitialLivesCount;
+        }
+
         private pokerDiceHand GetPreviousPlayerHandClaim()
         {
             return new pokerDiceHand("99999");
@@ -194,7 +200,10 @@ namespace ld
 
         private void ActionPreviousPlayerIsLiar()
         {
-
+            player previousPlayer = playersList[GetIndexOfPlayerPreviousTo(playerToActIndex)];
+            previousPlayer.DeductLife();
+            RewindTurnToPreviousPlayer();
+            currentActualHand = reroller.GetNewHand();
         }
 
         private void ActionIncorrectLiarCall()
@@ -218,6 +227,17 @@ namespace ld
                 playerToActIndex = 0;
         }
 
+        private int GetIndexOfPlayerPreviousTo(int playerIndex)
+        {
+            if (playerIndex > 0) return playerIndex - 1;
+            return playersList.Count() - 1;
+        }
+
+        private void RewindTurnToPreviousPlayer()
+        {
+            playerToActIndex = GetIndexOfPlayerPreviousTo(playerToActIndex);
+        }
+
         private static int nextIdentifierNumber = 1;
         private string identifier;
         private gameStatus status;
@@ -226,5 +246,6 @@ namespace ld
         private int playerToActIndex;
         private pokerDiceHand currentActualHand;
         private pokerDiceHandReroller reroller;
+        private int mInitialLivesCount;
     }
 }

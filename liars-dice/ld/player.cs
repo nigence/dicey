@@ -8,13 +8,14 @@ namespace ld
 {
     class player :  IComparable<player>
     {
-        public player(string playerName)
+        public player(string playerName, int initialLives)
         {
             name = playerName;
             string accessToken = "access-token-" + nextAccessTokenNumber.ToString();
             identifier = accessToken;
             nextAccessTokenNumber++;
             claim = null;
+            lifeCount = initialLives;
         }
 
         public string GetId()
@@ -59,11 +60,22 @@ namespace ld
             return rerollCount;
         }
 
+        public void DeductLife()
+        {
+            lifeCount--;
+        }
+
+        public int GetLivesRemaining()
+        {
+            return lifeCount;
+        }
+
         private static int nextAccessTokenNumber = 1;
         private string identifier;
         private string name;
         private int runningOrder;
         private pokerDiceHand claim;
         private int? rerollCount;
+        private int lifeCount;
     }
 }

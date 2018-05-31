@@ -471,7 +471,7 @@ namespace ld
             pdrtm.EnqueueRoll(pokerDieFace.N);
             pdrtm.EnqueueRoll(pokerDieFace.A);
 
-            gameEngineReturnMessage response = ge.CreateNewGame("Egbert");
+            gameEngineReturnMessage response = ge.CreateNewGame("Egbert", 3);
 
             var ngd = response as newGameDetails;
             if (ngd == null)
@@ -485,7 +485,7 @@ namespace ld
             pdrtm.EnqueueRoll(pokerDieFace.J);
             pdrtm.EnqueueRoll(pokerDieFace.N);
             pdrtm.EnqueueRoll(pokerDieFace.A);
-            response = ge.CreateNewGame("Nobacon");
+            response = ge.CreateNewGame("Nobacon", 3);
             ngd = response as newGameDetails;
             if (ngd == null)
                 return false;
@@ -573,9 +573,31 @@ namespace ld
             return true;
         }
 
-        private bool VerifyLivesRemaining(string playerName, int expectedLivesRemaining)
+        private bool VerifyLivesRemaining(string pollingPlayersAccessToken, string playerNameToView, int expectedLivesRemaining, gameEngine ge)
         {
-            return false;
+            bool appropriatePlayerStatusLineFound = false;
+            var pr = ge.Poll(pollingPlayersAccessToken);
+            pollResponse pollresponse = pr as pollResponse;
+            if (pollresponse == null) return false;
+            foreach (var psl in pollresponse.playerStatusLines)
+            {
+                if (psl.GetName() == playerNameToView)
+                {
+                    appropriatePlayerStatusLineFound = true;
+                    if(psl.GetLivesRemaining() != expectedLivesRemaining) return false;
+                }
+            }
+            return appropriatePlayerStatusLineFound;
+        }
+
+        private bool VerifyAllSeeLivesRemaining(string playerName, int expectedLivesRemaining, gameEngine ge, Dictionary<string, string> playersAccessTokens)
+        {
+            foreach (var p in playersAccessTokens)
+            {
+                if (!VerifyLivesRemaining(p.Value, playerName, expectedLivesRemaining, ge))
+                    return false;
+            }
+            return true;
         }
 
         private bool GameEngineSampleGameTestPassed()
@@ -586,7 +608,7 @@ namespace ld
             pdrtm.EnqueueRoll(pokerDieFace.J);
             pdrtm.EnqueueRoll(pokerDieFace.N);
             pdrtm.EnqueueRoll(pokerDieFace.A);
-            gameEngineReturnMessage response = ge.CreateNewGame("Alice");
+            gameEngineReturnMessage response = ge.CreateNewGame("Alice", 3);
             var ngd = response as newGameDetails;
             string gameIdentifier = ngd.GetGameIdentifier();
 
@@ -789,17 +811,8 @@ namespace ld
             pdrtm.EnqueueRoll(pokerDieFace.Q);
             ge.CallLiar(playersAccessTokens["Alice"]);
             if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Connie", ge, playersAccessTokens)) return false;
-            if (!VerifyLivesRemaining("Connie", 2)) return false;
-
-
-
-
-
-
-
-
-
-
+            if (!VerifyAllSeeLivesRemaining("Connie", 2, ge, playersAccessTokens)) return false;
+            if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("KQQTT"), ge, playersAccessTokens)) return false;
 
             return true;
 

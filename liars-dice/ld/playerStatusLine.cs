@@ -9,7 +9,8 @@ namespace ld
     class playerStatusLine
     {
         public playerStatusLine
-            (string name, 
+            (string name,
+            int livesRemaining,
             bool handClaimMade = false, 
             pokerDiceHand handClaim = null, 
             int? rerolledDiceCount = null)
@@ -19,6 +20,7 @@ namespace ld
             if (handClaimMade)
                 mClaim = handClaim;
             rerollDiceCount = rerolledDiceCount;
+            mLivesRemaining = livesRemaining;
         }
 
         public string GetName()
@@ -36,8 +38,14 @@ namespace ld
             return rerollDiceCount;
         }
 
+        public int GetLivesRemaining()
+        {
+            return mLivesRemaining;
+        }
+
         private string mName;
         private pokerDiceHand mClaim;
-        private int? rerollDiceCount; 
+        private int? rerollDiceCount;
+        private int mLivesRemaining;
     }
 }
