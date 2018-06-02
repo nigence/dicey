@@ -814,6 +814,29 @@ namespace ld
             if (!VerifyAllSeeLivesRemaining("Connie", 2, ge, playersAccessTokens)) return false;
             if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("KQQTT"), ge, playersAccessTokens)) return false;
 
+
+            //OTHER PLAYERS STILL HAVE 3 LIVES
+            if (!VerifyAllSeeLivesRemaining("Alice", 3, ge, playersAccessTokens)) return false;
+            if (!VerifyAllSeeLivesRemaining("Bob", 3, ge, playersAccessTokens)) return false;
+
+            //CONNIE DOES NOT LIE THIS TIME - CLAIMS TTJJK
+            ge.DeclareHand(playersAccessTokens["Connie"], new pokerDiceHand("TTJJK"));
+            if (!everyoneCanSeePlayersClaim("Connie", new pokerDiceHand("TTJJK"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Alice", ge, playersAccessTokens)) return false;
+
+            //ALICE GUESSES WRONG THIS TIME - CALLS LIAR BUT CONNIE NOT LYING 
+            //ALICE LOSES LIFE
+            //ALICE GETS NEW HAND OF KKQQQ
+            pdrtm.EnqueueRoll(pokerDieFace.K);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            pdrtm.EnqueueRoll(pokerDieFace.K);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            ge.CallLiar(playersAccessTokens["Alice"]);
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Alice", ge, playersAccessTokens)) return false;
+            if (!VerifyAllSeeLivesRemaining("Alice", 2, ge, playersAccessTokens)) return false;
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("KKQQQ"), ge, playersAccessTokens)) return false;
+
             return true;
 
         }
