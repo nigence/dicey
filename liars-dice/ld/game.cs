@@ -195,7 +195,10 @@ namespace ld
 
         private pokerDiceHand GetPreviousPlayerHandClaim()
         {
-            return new pokerDiceHand("99999");
+            int previousPlayerIndex = GetIndexOfPlayerPreviousTo(playerToActIndex);
+            player previousPlayer = playersList[previousPlayerIndex];
+            pokerDiceHand pdh = previousPlayer.GetHandClaim();
+            return pdh;
         }
 
         private void ActionPreviousPlayerIsLiar()
@@ -208,7 +211,9 @@ namespace ld
 
         private void ActionIncorrectLiarCall()
         {
-
+            player currentPlayer = playersList[playerToActIndex];
+            currentPlayer.DeductLife();
+            this.status = gameStatus.awaitingPlayerToClaimHandRank;
         }
 
 
