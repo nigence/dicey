@@ -214,6 +214,7 @@ namespace ld
             player currentPlayer = playersList[playerToActIndex];
             currentPlayer.DeductLife();
             this.status = gameStatus.awaitingPlayerToClaimHandRank;
+            currentActualHand = reroller.GetNewHand();
         }
 
 

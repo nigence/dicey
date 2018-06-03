@@ -837,6 +837,13 @@ namespace ld
             if (!VerifyAllSeeLivesRemaining("Alice", 2, ge, playersAccessTokens)) return false;
             if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("KKQQQ"), ge, playersAccessTokens)) return false;
 
+            //ALICE MAKES TRUTHFUL CLAIM OF QQQKK
+            ge.DeclareHand(playersAccessTokens["Alice"], new pokerDiceHand("QQQKK"));
+            if (!everyoneCanSeePlayersClaim("Alice", new pokerDiceHand("QQQKK"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Bob", ge, playersAccessTokens)) return false;
+
+
+
             return true;
 
         }
