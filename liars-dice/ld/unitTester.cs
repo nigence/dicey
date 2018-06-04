@@ -910,6 +910,11 @@ namespace ld
             if (!VerifyAllSeeLivesRemaining("Connie", 0, ge, playersAccessTokens)) return false;
             if (!playerHasHandOthersCantSee("Bob", new pokerDiceHand("999QA"), ge, playersAccessTokens)) return false;
 
+            //BOB MAKES EXAGERATED CLAIM 9TTQA
+            ge.DeclareHand(playersAccessTokens["Bob"], new pokerDiceHand("9TTQA"));
+            if (!everyoneCanSeePlayersClaim("Bob", new pokerDiceHand("9TTQA"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Alice", ge, playersAccessTokens)) return false;
+
             return true;
 
         }
