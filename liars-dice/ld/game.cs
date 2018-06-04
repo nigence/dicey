@@ -228,10 +228,30 @@ namespace ld
 
         private void MoveTurnToNextPlayer()
         {
-            playerToActIndex++;
-            if (playerToActIndex == playersList.Count())
-                playerToActIndex = 0;
+            playerToActIndex = GetIndexOfSubsequentPlayer(playerToActIndex);
         }
+
+        private int GetIndexOfSubsequentPlayer(int playerIndex, bool ignoreLivesCounts = false)
+        {
+            if (ignoreLivesCounts)
+            {
+                int nextIndex = playerIndex + 1;
+                if (nextIndex == playersList.Count()) return 0;
+                return nextIndex;
+            }
+            else
+            {
+                int i = playerIndex;
+                for (; ; )
+                {
+                    i = GetIndexOfSubsequentPlayer(i, true);
+                    player p = playersList[i];
+                    int livesCount = p.GetLivesRemaining();
+                    if (livesCount > 0) return i;
+                }
+            }
+        }
+
 
         private int GetIndexOfPlayerPreviousTo(int playerIndex, bool ignoreLivesCounts = false)
         {
