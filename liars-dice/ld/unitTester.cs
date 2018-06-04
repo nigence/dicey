@@ -842,6 +842,34 @@ namespace ld
             if (!everyoneCanSeePlayersClaim("Alice", new pokerDiceHand("QQQKK"), ge, playersAccessTokens)) return false;
             if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Bob", ge, playersAccessTokens)) return false;
 
+            //BOB ACCEPTS THE HAND
+            ge.AcceptHand(playersAccessTokens["Bob"]);
+            if (!playerHasHandOthersCantSee("Bob", new pokerDiceHand("KKQQQ"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToChooseDiceToReRollOrNone, "Bob", ge, playersAccessTokens)) return false;
+
+            //BOB REROLLS ONE OF THE KINGS AND GETS A JACK
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            ge.ReRoll(playersAccessTokens["Bob"], "K");
+
+            //SO, NOW HE HAS KJQQQ AND PLAYERS ARE WAITING FOR HIM TO DECLARE A HAND
+            if (!playerHasHandOthersCantSee("Bob", new pokerDiceHand("KJQQQ"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Bob", ge, playersAccessTokens)) return false;
+
+            //BOB BLUFFS THAT CONNIE REALLY DID PASS HIM 3 QUEENS AND THAT HE HAS JUST ROLLED A FURTHER ONE
+            ge.DeclareHand(playersAccessTokens["Bob"], new pokerDiceHand("KQQQQ"));
+            if (!everyoneCanSeePlayersClaim("Bob", new pokerDiceHand("KQQQQ"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Connie", ge, playersAccessTokens)) return false;
+
+            //CONNIE ACCEPTS THE "FOUR QUEENS" - SHE WILL WISH SHE HADN'T!
+            ge.AcceptHand(playersAccessTokens["Connie"]);
+            if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("KJQQQ"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToChooseDiceToReRollOrNone, "Connie", ge, playersAccessTokens)) return false;
+
+            //CONNIE REROLLS THE KING AND GETS A 9 MAKING 9JQQQ
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            ge.ReRoll(playersAccessTokens["Connie"], "K");
+            if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("9JQQQ"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Connie", ge, playersAccessTokens)) return false;
 
 
             return true;
