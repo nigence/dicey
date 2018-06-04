@@ -233,10 +233,24 @@ namespace ld
                 playerToActIndex = 0;
         }
 
-        private int GetIndexOfPlayerPreviousTo(int playerIndex)
+        private int GetIndexOfPlayerPreviousTo(int playerIndex, bool ignoreLivesCounts = false)
         {
-            if (playerIndex > 0) return playerIndex - 1;
-            return playersList.Count() - 1;
+            if (ignoreLivesCounts)
+            {
+                if (playerIndex > 0) return playerIndex - 1;
+                return playersList.Count() - 1;
+            }
+            else
+            {
+                int i = playerIndex;
+                for(; ; )
+                {
+                    i = GetIndexOfPlayerPreviousTo(i, true);
+                    player p = playersList[i];
+                    int livesCount = p.GetLivesRemaining();
+                    if (livesCount > 0) return i;
+                }
+            }
         }
 
         private void RewindTurnToPreviousPlayer()
