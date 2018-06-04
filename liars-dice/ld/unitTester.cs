@@ -871,6 +871,44 @@ namespace ld
             if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("9JQQQ"), ge, playersAccessTokens)) return false;
             if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Connie", ge, playersAccessTokens)) return false;
 
+            //CONNIE CLAIMS IT'S 5 QUEENS
+            ge.DeclareHand(playersAccessTokens["Connie"], new pokerDiceHand("QQQQQ"));
+            if (!everyoneCanSeePlayersClaim("Connie", new pokerDiceHand("QQQQQ"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Alice", ge, playersAccessTokens)) return false;
+
+            //ALICE ISN'T BUYING IT!
+            //CONNIE LOSES A LIFE
+            //TURN RETURNS TO CONNIE
+            //SHE GETS 99JQA as a fresh hand
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
+            ge.CallLiar(playersAccessTokens["Alice"]);
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Connie", ge, playersAccessTokens)) return false;
+            if (!VerifyAllSeeLivesRemaining("Connie", 1, ge, playersAccessTokens)) return false;
+            if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("99JQA"), ge, playersAccessTokens)) return false;
+
+            //CONNIE INFLATES HER CLAIM AS TTJQA
+            ge.DeclareHand(playersAccessTokens["Connie"], new pokerDiceHand("TTJQA"));
+            if (!everyoneCanSeePlayersClaim("Connie", new pokerDiceHand("TTJQA"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Alice", ge, playersAccessTokens)) return false;
+
+            //ALICE CALLS LIAR AGAIN
+            //CONNIE LOSES HER LAST LIFE
+            //CONNIE IS ELIMINATED
+            //TURN WOULD RETURN TO CONNIE BUT NOW PASSES TO BOB
+            //HE GETS 999QA as a fresh hand
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
+            ge.CallLiar(playersAccessTokens["Alice"]);
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Bob", ge, playersAccessTokens)) return false;
+            if (!VerifyAllSeeLivesRemaining("Connie", 0, ge, playersAccessTokens)) return false;
+            if (!playerHasHandOthersCantSee("Bob", new pokerDiceHand("999QA"), ge, playersAccessTokens)) return false;
 
             return true;
 
