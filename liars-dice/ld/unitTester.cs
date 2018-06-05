@@ -915,6 +915,49 @@ namespace ld
             if (!everyoneCanSeePlayersClaim("Bob", new pokerDiceHand("9TTQA"), ge, playersAccessTokens)) return false;
             if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Alice", ge, playersAccessTokens)) return false;
 
+            //PLAY SKIPS PAST CONNIE BECAUSE SHE IS OUT OF LIVES
+            //ALICE ACCEPTS THE HAND
+            ge.AcceptHand(playersAccessTokens["Alice"]);
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("999QA"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToChooseDiceToReRollOrNone, "Alice", ge, playersAccessTokens)) return false;
+
+            //ALICE REROLLS 999 AND GETS JQK MAKING JQKQA
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            pdrtm.EnqueueRoll(pokerDieFace.K);
+            ge.ReRoll(playersAccessTokens["Alice"], "999");
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("JQKQA"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Alice", ge, playersAccessTokens)) return false;
+
+            //ALICE MAKES EXAGERATED CLAIM TTTKA
+            ge.DeclareHand(playersAccessTokens["Alice"], new pokerDiceHand("TTTKA"));
+            if (!everyoneCanSeePlayersClaim("Alice", new pokerDiceHand("TTTKA"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Bob", ge, playersAccessTokens)) return false;
+
+            //BOB CALLS LIAR AND ALICE IS DOWN TO LAST LIFE
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.K);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
+            ge.CallLiar(playersAccessTokens["Bob"]);
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Alice", ge, playersAccessTokens)) return false;
+            if (!VerifyAllSeeLivesRemaining("Alice", 1, ge, playersAccessTokens)) return false;
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("JJQKA"), ge, playersAccessTokens)) return false;
+
+            //ALICE MAKES EXAGERATED CLAIM 999KA
+            ge.DeclareHand(playersAccessTokens["Alice"], new pokerDiceHand("999KA"));
+            if (!everyoneCanSeePlayersClaim("Alice", new pokerDiceHand("999KA"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Bob", ge, playersAccessTokens)) return false;
+
+            //BOB CALLS LIAR CORRECTLY
+            //EVERYONE CAN SEE THAT ALICE HAS NO LIVES LEFT
+            //EVERYONE CAN SEE THAT BOB IS THE WINNER
+            ge.CallLiar(playersAccessTokens["Bob"]);
+            if (!VerifyAllSeeLivesRemaining("Alice", 0, ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.endedWithWinner, "Bob", ge, playersAccessTokens)) return false;
+
+
             return true;
 
         }

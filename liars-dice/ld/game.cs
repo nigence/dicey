@@ -183,7 +183,6 @@ namespace ld
                 ActionIncorrectLiarCall();
 
 
-            status = gameStatus.awaitingPlayerToClaimHandRank;
 
 
         }
@@ -201,20 +200,64 @@ namespace ld
             return pdh;
         }
 
+        private bool hasWinner()
+        {
+            return (this.GetWinnersName() != null);
+        }
+
+        private string GetWinnersName()
+        {
+            int remainingPlayersCount = 0;
+            player pwithlife = null; ;
+            foreach (var p in playersList)
+            {
+                if (p.GetLivesRemaining() > 0)
+                {
+                    remainingPlayersCount++;
+                    pwithlife = p;
+                }
+            }
+            if(remainingPlayersCount == 1)
+            {
+                return pwithlife.GetName();
+            }
+            return null;
+        }
+
         private void ActionPreviousPlayerIsLiar()
         {
             player previousPlayer = playersList[GetIndexOfPlayerPreviousTo(playerToActIndex)];
             previousPlayer.DeductLife();
-            RewindTurnToPreviousPlayer();
-            currentActualHand = reroller.GetNewHand();
+            if (hasWinner())
+            {
+                SetPlayerToActIndex(GetWinnersName());
+                status = gameStatus.endedWithWinner;
+            }
+            else
+            {
+                RewindTurnToPreviousPlayer();
+                currentActualHand = reroller.GetNewHand();
+                status = gameStatus.awaitingPlayerToClaimHandRank;
+            }
         }
 
         private void ActionIncorrectLiarCall()
         {
             player currentPlayer = playersList[playerToActIndex];
             currentPlayer.DeductLife();
-            this.status = gameStatus.awaitingPlayerToClaimHandRank;
-            currentActualHand = reroller.GetNewHand();
+            if (hasWinner())
+            {
+                SetPlayerToActIndex(GetWinnersName());
+                status = gameStatus.endedWithWinner;
+            }
+            else
+            {
+                this.status = gameStatus.awaitingPlayerToClaimHandRank;
+                currentActualHand = reroller.GetNewHand();
+                status = gameStatus.awaitingPlayerToClaimHandRank;
+            }
+
+
         }
 
 
@@ -276,6 +319,20 @@ namespace ld
         private void RewindTurnToPreviousPlayer()
         {
             playerToActIndex = GetIndexOfPlayerPreviousTo(playerToActIndex);
+        }
+
+        private void SetPlayerToActIndex(string playerName)
+        {
+            player p = null;
+            for (int i = 0; i < playersList.Count; i++)
+            {
+                p = playersList[i];
+                if(p.GetName() == playerName)
+                {
+                    playerToActIndex = i;
+                    return;
+                }
+            }
         }
 
         private static int nextIdentifierNumber = 1;
