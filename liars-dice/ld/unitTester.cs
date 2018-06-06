@@ -29,6 +29,7 @@ namespace ld
                 if (!rerollerFacesRemainderTestPassed()) break;
                 if (!GameEngineNewGameTestPassed()) break;
                 if (!GameEngineSampleGameTestPassed()) break;
+                if (!GameEngineStalemateRoundTestPassed()) break;
                 allOkay = true;
             }
             if (!allOkay)
@@ -976,5 +977,51 @@ namespace ld
             return true;
         }
 
+
+
+        private bool GameEngineStalemateRoundTestPassed()
+        {
+            gameEngine ge;
+            Dictionary<string, string> playersAccessTokens;
+            if (!StartOfSampleGameTestPassed(out ge, out playersAccessTokens)) return false;
+
+            //Connie is trying to pass off AJ999 as Q9999
+            ge.AcceptHand(playersAccessTokens["Alice"]);
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("AJ999"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToChooseDiceToReRollOrNone, "Alice", ge, playersAccessTokens)) return false;
+
+            //ALICE REROLLS 999J AND GETS AAAK MAKING AAAAK
+            pdrtm.EnqueueRoll(pokerDieFace.A);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
+            pdrtm.EnqueueRoll(pokerDieFace.K);
+            ge.ReRoll(playersAccessTokens["Alice"], "999J");
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("AAAAK"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Alice", ge, playersAccessTokens)) return false;
+
+            //ALICE MAKES EXAGERATED CLAIM AAAAA - i.e. the highest claim possible
+            ge.DeclareHand(playersAccessTokens["Alice"], new pokerDiceHand("AAAAA"));
+            if (!everyoneCanSeePlayersClaim("Alice", new pokerDiceHand("AAAAA"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Bob", ge, playersAccessTokens)) return false;
+
+            //BOB ACCEPTS THE CLAIM OF AAAAA
+            //NOBODY LOSES A LIFE
+            //HE DOESN'T SEE IF ALICE WAS LYING
+            //HE GETS A FRESH HAND 9TJQA AND MUST DECLARE A HAND RANK
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.T);
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
+            ge.AcceptHand(playersAccessTokens["Bob"]);
+            if (!VerifyAllSeeLivesRemaining("Connie", 3, ge, playersAccessTokens)) return false;
+            if (!VerifyAllSeeLivesRemaining("Alice", 3, ge, playersAccessTokens)) return false;
+            if (!VerifyAllSeeLivesRemaining("Bob", 3, ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Bob", ge, playersAccessTokens)) return false;
+
+            return true;
+        }
+
     }
+
 }
