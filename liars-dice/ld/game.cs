@@ -13,7 +13,7 @@ namespace ld
             string id = "game-identifier-" + nextIdentifierNumber.ToString();
             identifier = id;
             nextIdentifierNumber++;
-            playersList = new List<player>(); 
+            playersList = new List<player>();
             playersList.Add(administrator);
             mAdministrator = administrator;
             status = gameStatus.playersJoining;
@@ -45,7 +45,7 @@ namespace ld
 
         public bool isOpenToNewPlayers()
         {
-            return (status == gameStatus.playersJoining) ;
+            return (status == gameStatus.playersJoining);
         }
 
         public void Start()
@@ -56,7 +56,7 @@ namespace ld
 
         public bool hasPlayerId(string Id)
         {
-            foreach(var p in playersList)
+            foreach (var p in playersList)
             {
                 if (p.GetId() == Id)
                     return true;
@@ -109,24 +109,24 @@ namespace ld
         public List<string> GetPlayersNames()
         {
             List<string> names = new List<string>();
-            foreach( var p in playersList )
+            foreach (var p in playersList)
                 names.Add(p.GetName());
             return names;
         }
 
-        public bool SetRunningOrder( List<string> playersNames )
+        public bool SetRunningOrder(List<string> playersNames)
         {
             if (playersList.Count != playersNames.Count)
                 return false;
 
-            foreach(var n in playersNames)
+            foreach (var n in playersNames)
             {
                 if (!this.hasPlayerNamed(n))
                     return false;
             }
 
             int runningOrderNumber = 0;
-            foreach(var n in playersNames)
+            foreach (var n in playersNames)
             {
                 var p = this.GetPlayerByName(n);
                 p.SetRunningOrder(runningOrderNumber);
@@ -156,13 +156,17 @@ namespace ld
             player p = null;
             if ((!ConfirmPlayerIsWithActionAwaited(playerId, ref p)) ||
                 (this.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar)) return;
-            status = gameStatus.awaitingPlayerToChooseDiceToReRollOrNone;
+
+            if (StalemateDetected())
+                status = gameStatus.awaitingPlayerToClaimHandRank;
+            else
+                status = gameStatus.awaitingPlayerToChooseDiceToReRollOrNone;
         }
 
         public void ReRoll(string playerId, string facesToReRoll)
         {
             player p = null;
-            if ((!ConfirmPlayerIsWithActionAwaited(playerId, ref p)) || 
+            if ((!ConfirmPlayerIsWithActionAwaited(playerId, ref p)) ||
                 (this.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone)) return;
             status = gameStatus.awaitingPlayerToClaimHandRank;
             p.SetRerollCount(facesToReRoll.Length);
@@ -217,7 +221,7 @@ namespace ld
                     pwithlife = p;
                 }
             }
-            if(remainingPlayersCount == 1)
+            if (remainingPlayersCount == 1)
             {
                 return pwithlife.GetName();
             }
@@ -306,7 +310,7 @@ namespace ld
             else
             {
                 int i = playerIndex;
-                for(; ; )
+                for (; ; )
                 {
                     i = GetIndexOfPlayerPreviousTo(i, true);
                     player p = playersList[i];
@@ -327,12 +331,21 @@ namespace ld
             for (int i = 0; i < playersList.Count; i++)
             {
                 p = playersList[i];
-                if(p.GetName() == playerName)
+                if (p.GetName() == playerName)
                 {
                     playerToActIndex = i;
                     return;
                 }
             }
+        }
+
+        private bool StalemateDetected() //Use only within accept hand function
+        {
+            pokerDiceHand AAAAA = new pokerDiceHand("AAAAA");
+            if (AAAAA == GetPreviousPlayerHandClaim())
+                return true;
+
+            return false;
         }
 
         private static int nextIdentifierNumber = 1;
