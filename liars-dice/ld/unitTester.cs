@@ -600,9 +600,15 @@ namespace ld
             return true;
         }
 
-        private bool GameEngineSampleGameTestPassed()
+        // StartOfSampleGameTestPassed()
+        //   gets a new game started.
+        //   The players are :- Bob, Connie, and Alice.
+        //   At the end of this function, no player lives have been lost (all have 3).
+        //   It is Alice's turn to play. She just decide whether or not to accept the hand.
+        //   Connie is trying to pass off AJ999 as Q9999
+        private bool StartOfSampleGameTestPassed(out gameEngine ge, out Dictionary<string, string> playersAccessTokens)
         {
-            gameEngine ge = new gameEngine(pdrtm);
+            ge = new gameEngine(pdrtm);
             pdrtm.EnqueueRoll(pokerDieFace.T);
             pdrtm.EnqueueRoll(pokerDieFace.N);
             pdrtm.EnqueueRoll(pokerDieFace.J);
@@ -612,7 +618,7 @@ namespace ld
             var ngd = response as newGameDetails;
             string gameIdentifier = ngd.GetGameIdentifier();
 
-            Dictionary<string, string> playersAccessTokens = new Dictionary<string, string>();
+            playersAccessTokens = new Dictionary<string, string>();
             playersAccessTokens.Add("Alice", ngd.GetAccessToken());
 
             // TWO MORE PLAYERS JOIN
@@ -795,9 +801,19 @@ namespace ld
 
             //SHE TRIES TO PASS IT OFF AS Q9999
             ge.DeclareHand(playersAccessTokens["Connie"], new pokerDiceHand("Q9999"));
-            if (!everyoneCanSeePlayersClaim("Connie", new pokerDiceHand("Q9999"), ge, playersAccessTokens))return false;
+            if (!everyoneCanSeePlayersClaim("Connie", new pokerDiceHand("Q9999"), ge, playersAccessTokens)) return false;
             if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Alice", ge, playersAccessTokens)) return false;
 
+            return true;
+        }
+
+        private bool GameEngineSampleGameTestPassed()
+        {
+            gameEngine ge;
+            Dictionary<string, string> playersAccessTokens;
+            if (!StartOfSampleGameTestPassed(out ge, out playersAccessTokens)) return false;
+
+            //Connie is trying to pass off AJ999 as Q9999
 
             //ALICE CALLS LIAR
             //ALICE IS CORRECT
@@ -957,9 +973,7 @@ namespace ld
             if (!VerifyAllSeeLivesRemaining("Alice", 0, ge, playersAccessTokens)) return false;
             if (!allPlayersSeeGameStatus(gameStatus.endedWithWinner, "Bob", ge, playersAccessTokens)) return false;
 
-
             return true;
-
         }
 
     }
