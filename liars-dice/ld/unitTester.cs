@@ -30,6 +30,7 @@ namespace ld
                 if (!GameEngineNewGameTestPassed()) break;
                 if (!GameEngineSampleGameTestPassed()) break;
                 if (!GameEngineStalemateRoundTestPassed()) break;
+                if (!GameNotFoundErrorTestPassed()) break;
                 allOkay = true;
             }
             if (!allOkay)
@@ -1022,6 +1023,24 @@ namespace ld
             return true;
         }
 
+        private bool GameNotFoundErrorTestPassed()
+        {
+            gameEngine ge = new gameEngine(pdrtm);
+            pdrtm.EnqueueRoll(pokerDieFace.T);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
+            gameEngineReturnMessage response = ge.CreateNewGame("Alice", 3);
+            var ngd = response as newGameDetails;
+            string gameIdentifier = ngd.GetGameIdentifier();
+            gameIdentifier += "deliberately made wrong";
+            response = ge.JoinGame(gameIdentifier, "Bob");
+            var pr = response as playerRegistration;
+            if (pr.GetAccessToken() != null) return false;
+
+            return true;
+        }
     }
 
 }
