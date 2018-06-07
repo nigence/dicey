@@ -20,7 +20,7 @@ namespace ld
             game newGame = new game(administrator, mRoller, initialLives);
             gamesList.Add(newGame);
 
-            newGameDetails returnMsg = new newGameDetails(true, administrator.GetId(), newGame.GetId());
+            newGameDetails returnMsg = new newGameDetails(administrator.GetId(), newGame.GetId());
             return returnMsg;
         }
 

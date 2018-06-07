@@ -8,28 +8,22 @@ namespace ld
 {
     class newGameDetails : gameEngineReturnMessage
     {
-        public newGameDetails( bool gameCreatedOkay, string accessToken, string gameName)
+        public newGameDetails(string accessToken, string gameName)
         {
-            ok = gameCreatedOkay;
             token = accessToken;
             id = gameName;
         }
 
         public string GetAccessToken()
         {
-            if (!ok)
-                return null;
             return token;
         }
 
         public string GetGameIdentifier()
         {
-            if (!ok)
-                return null;
             return id;
         }
 
-        private bool ok;
         private string id;
         private string token;
 
