@@ -28,6 +28,8 @@ function runAll() {
         echo "......Pass";
 }
 
+echo 'Current PHP version: ' . phpversion();
+echo "\n \n";
 runAll();
 
 ?>
