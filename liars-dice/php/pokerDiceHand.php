@@ -3,71 +3,68 @@
 //require_once(__ROOT__.'/config.php'); 
 
 class pokerDiceHand{
-    public static function isValidFacesString($facesString){
-        //string s = string.Empty;
-        $s = "";
+   public static function isValidFacesString($facesString){
+      //string s = string.Empty;
+      $s = "";
 
-        //foreach(char c in facesString)
-        $chararray = str_split($your_string);
-            //foreach(char c in facesString)
-            //{
-            //    s = string.Empty;
-            //    s += c;
-            //    int i = Index(s);
-            //    if (i < 0)
-            //        return false;
-            //}
-        return TRUE;
-    }
-
-    function blah(){
-	    $foo = 2;
-	    return FALSE;
-
-    }
-
-/*
-        public pokerDiceHand(String fiveFacesString)
-        {
-            int[] facesCounts = new int[FacesCount()];
-
-            for (int j= FacesCount() - 1; j>-1; j--)
-            {
-                countFaces(fiveFacesString, Face(j), ref facesCounts[j]);
-
-                for (int i = 0; i < facesCounts[j]; i++)
-                    faces += Face(j);
-            }
-
-            SetHashCode(facesCounts);
-            SetHandKind(facesCounts);
-            RefineHandKind(facesCounts);
-        }
-
-        public HandKind getHandKind()
-        {
-            return handKind;
-        }
+      //foreach(char c in facesString)
+      $chararray = str_split($your_string);
+      foreach ($chararray as $c){
+         $i = Index($c);
+         if ($i < 0)
+            return FALSE;
+      }
+      return TRUE;
+   }
 
 
-        public string getFacesOrderedByRank()
-        {
-            return faces;
-        }
+   //public pokerDiceHand(String fiveFacesString)
+   public function __construct($fiveFacesString){
+      //int[] facesCounts = new int[FacesCount()];
+
+      //for (int j= FacesCount() - 1; j>-1; j--) 
+      for ($j = FacesCount() - 1; $j > -1; $j--) {
+         //countFaces(fiveFacesString, Face(j), ref facesCounts[j]);
+         countFaces($fiveFacesString, Face($j), $facesCounts[$j]);
+
+         //for (int i = 0; i < facesCounts[j]; i++)
+         for ($i = 0; $i < $facesCounts[j]; $i++){
+            //faces += Face(j);
+            $this->$faces += Face($j);
+         }
+      }
+
+      SetHashCode($facesCounts);
+      SetHandKind($facesCounts);
+      RefineHandKind($facesCounts);
+   }
 
 
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-                return false;
+   //public HandKind getHandKind()
+   public function getHandKind() {
+      return $this->$handKind;
+   }
+
+
+   //public string getFacesOrderedByRank()
+   public function getFacesOrderedByRank() {
+      return $this->$faces;
+   }
+
+
+   //public override bool Equals(object obj)
+   public function Equals($obj) {
+      if (is_null($obj))
+         return FALSE;
 
             pokerDiceHand p = obj as pokerDiceHand;
             if ((System.Object)p == null)
                 return false;
 
             return (faces == p.faces);
-        }
+   }
 
+/*
         public bool Equals ( pokerDiceHand obj )
         {
             if (ReferenceEquals(obj, null))
@@ -247,41 +244,43 @@ class pokerDiceHand{
 
         private HandKind handKind;
         private int hashcode;
-        private String faces = "";
+*/
+   //private String faces = "";
+   private $faces = "";
+
+/*
         private int? primaryFace;
         private int? secondaryFace;
  */
 
-	//private static string Face(int facenum)
-	private static function Face($facenum){
-	switch($facenum){
-	case 0: $retval = "9"; break;
-	case 1: $retval = "T"; break;
-	case 2: $retval = "J"; break;
-	case 3: $retval = "Q"; break;
-	case 4: $retval = "K"; break;
-	case 5: $retval = "A"; break;
-	}
-	return $retval;
-	}
 
+   //private static string Face(int facenum)
+   private static function Face($facenum){
+      switch($facenum){
+         case 0: $retval = "9"; break;
+         case 1: $retval = "T"; break;
+         case 2: $retval = "J"; break;
+         case 3: $retval = "Q"; break;
+         case 4: $retval = "K"; break;
+         case 5: $retval = "A"; break;
+      }
+      return $retval;
+   }
+
+   private static function Index($facestring){
+      $i = 0;
+      $s = "";
+      do {
+         $s = Face($i);
+         if ($s == $facestring)
+            return $i;
+         $i++;
+      }
+      while (strlen($s) > 0);
+
+      return -1;
+   }
 /*
-        private static int Index(string face)
-        {
-            int i = 0;
-            string s = "";
-            do
-            {
-                s = Face(i);
-                if (s == face)
-                    return i;
-                i++;
-            }
-            while (s.Length > 0);
-
-            return -1;
-        }
-
         private static int FacesCount()
         {
             return (Index("A")+1);
