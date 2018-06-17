@@ -5,7 +5,7 @@ require_once(__ROOT__.'/unitTester.php');
 
 
 function runAll() {
-    echo "runAll()";
+    echo "runAll()\n";
 
     $allOkay = FALSE;
     for ($i = 0; $i < 1; $i++)
