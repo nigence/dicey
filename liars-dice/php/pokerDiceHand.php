@@ -49,10 +49,14 @@ class pokerDiceHand{
             $this->$facesString .= pokerDiceHand::Face($j);
          }
       }
-      echo '$this->$facesString=' . $this->$facesString . "\n";
+      echo '$this->$facesString= ' . $this->$facesString . "\n";
       $this->SetHashCode($facesCounts);
+      echo '$this->$hashcode = '. $this->$hashcode ."\n";
       $this->SetHandKind($facesCounts);
+      echo '$this->$handKind = '. $this->$handKind . "\n";
       $this->RefineHandKind($facesCounts);
+      echo '$this->$primaryFaceNum = ' .   $this->$primaryFaceNum . "\n";
+      echo '$this->$secondaryFaceNum = ' . $this->$secondaryFaceNum . "\n";
    }
 
 
@@ -93,52 +97,7 @@ class pokerDiceHand{
 
 
    //public static bool operator == (pokerDiceHand lhs, pokerDiceHand rhs)
-   public static function eq($lhs, $rhs)
-   {
-      echo "eq()\n";
-      var_dump($lhs);
-      var_dump($rhs);
-      //if (ReferenceEquals(lhs, null) && ReferenceEquals(rhs, null))
-      //   return true;
-      //if (ReferenceEquals(lhs, null))
-      //   return false;
-      //if (ReferenceEquals(rhs, null))
-      //   return false;
-      //if (ReferenceEquals(lhs, rhs))
-      //   return true;
-      //if (lhs.faces == rhs.faces)
-      //   return true;
-      //return false;
-      if(is_null($lhs) && is_null($rhs))
-      {
-         echo "a";
-         return TRUE;
-      }
-      if(is_null($lhs) )
-      {
-         echo "b";
-         return FALSE;
-      }
-      if(is_null($rhs) )
-      {
-         echo "c";
-         return FALSE;
-      }
-      if( $lhs === $rhs )
-      {
-         echo "d";
-         return TRUE;
-      }
-      if( $lhs->$facesString == $rhs->$facesString)
-      {
-         echo "e\n";
-         echo $lhs->$facesString . "\n"; 
-         echo $rhs->$facesString . "\n"; 
-         return TRUE;
-      }
-      return FALSE;
-   }
-
+   // NOTE see function eq() below - taken outside of class.
 
    //public static bool operator !=(pokerDiceHand lhs, pokerDiceHand rhs)
    public static function ne(pokerDiceHand $lhs, pokerDiceHand $rhs)
@@ -153,10 +112,10 @@ class pokerDiceHand{
       if ($lhs->$handKind != $rhs->$handKind)
          return $lhs->$handKind < $rhs->$handKind;
 
-      if ($lhs->$primaryFace != $rhs->$primaryFace)
-         return $lhs->$primaryFace > $rhs->$primaryFace;
-      if ($lhs->$secondaryFace != $rhs->$secondaryFace)
-         return $lhs->$secondaryFace > $rhs->$secondaryFace;
+      if ($lhs->$primaryFaceNum != $rhs->$primaryFaceNum)
+         return $lhs->$primaryFaceNum > $rhs->$primaryFaceNum;
+      if ($lhs->$secondaryFaceNum != $rhs->$secondaryFaceNum)
+         return $lhs->$secondaryFaceNum > $rhs->$secondaryFaceNum;
       return $lhs->$hashcode > $rhs->$hashcode;
    }
 
@@ -190,7 +149,7 @@ class pokerDiceHand{
       {
          $this->$hashcode += $multiplier * $facesCountsArray[$i];
          $multiplier *= 10;
-         echo '$this->$hashcode ='. $this->$hashcode ."\n";
+         //echo '$this->$hashcode ='. $this->$hashcode ."\n";
       }
    }
 
@@ -254,42 +213,56 @@ class pokerDiceHand{
    //private void RefineHandKind(int[] facesCounts)
    private function RefineHandKind($facesCountsArray)
    {
+      echo "RefineHandKind()\n";
+      echo '$facesCountsArray = '." \n";
+      var_dump($facesCountsArray);
+      echo "\n";
       switch($this->$handKind)
       {
          case HandKind::fiveOfKind:
-            $this->$primaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 5);
+            $this->$primaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 5);
             break;
 
          case HandKind::fourOfKind:
-            $this->$primaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 4);
-            $this->$secondaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 1);
+            $this->$primaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 4);
+            $this->$secondaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 1);
             break;
 
          case HandKind::fullHouse:
-            $this->$primaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 3);
-            $this->$secondaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 2);
+            $this->$primaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 3);
+            $this->$secondaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 2);
             break;
 
          case HandKind::straight:
 
          case HandKind::threeOfKind:
-            $this->$primaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 3);
-            $this->$secondaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 1);
+            $this->$primaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 3);
+            $this->$secondaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 1);
             break;
 
          case HandKind::twoPairs:
-            $this->$primaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 2);
-            $this->$secondaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 2, $this->$primaryFace);
+            echo 'HandKind::twoPairs'."\n";
+
+            $rva = pokerDiceHand::FindRepeatedFace($facesCountsArray, 2);
+            echo 'returned is: '. $rva . "\n";
+            $this->$primaryFaceNum = 5; //$rva;
+
+            $rvb = pokerDiceHand::FindRepeatedFace($facesCountsArray, 2, $this->$primaryFaceNum);
+            echo 'returned is: '. $rvb . "\n";
+            $this->$secondaryFaceNum = 2; //$rvb;
+
+            echo '$this->$primaryFaceNum = ' . $this->$primaryFaceNum . "\n";
+            echo '$this->$secondaryFaceNum = ' . $this->$secondaryFaceNum . "\n";
             break;
 
          case HandKind::pair:
-            $this->$primaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 2);
-            $this->$secondaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 1, $this->$primaryFace);
+            $this->$primaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 2);
+            $this->$secondaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 1, $this->$primaryFaceNum);
             break;
 
          case HandKind::none:
-            $this->$primaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 1);
-            $this->$secondaryFace = pokerDiceHand::FindRepeatedFace($facesCountsArray, 1, $this->$primaryFace);
+            $this->$primaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 1);
+            $this->$secondaryFaceNum = pokerDiceHand::FindRepeatedFace($facesCountsArray, 1, $this->$primaryFaceNum);
             break;
       }
    }
@@ -298,16 +271,28 @@ class pokerDiceHand{
    //private static int FindRepeatedFace(int[] facesCounts,  int frequency, int? excludeA=null, int? excludeB=null )
    private static function FindRepeatedFace($facesCountsArray,  $frequency, $excludeA=null, $excludeB=null )
    {
+      echo "FindRepeatedFace()\n";
+      echo '$facesCountsArray = '.$facesCountsArray."\n";
+      echo '$frequency = '.$frequency."\n";
+      echo '$excludeA = '.$excludeA."\n";
+      echo '$excludeB = '.$excludeB."\n";
+
       for ($j = pokerDiceHand::FacesCount() - 1; $j > -1; $j--)
       {
+         echo '$j = '. $j . "\n";
+         echo '$facesCountsArray[$j] = '. $facesCountsArray[$j] . "\n";
          if($facesCountsArray[$j]==$frequency)
          {
+            echo "a\n";
             if (($excludeA == null && $excludeB == null)
                         || (($excludeA == null) && ($excludeB != $j))
                         || (($excludeB == null) && ($excludeA != $j))
                         || (($excludeA != $j) && ($excludeB != $j))
                         )
+            {
+               echo "b\n";
                return $j;
+            }
          }
       }
       return -1;
@@ -355,6 +340,53 @@ class pokerDiceHand{
       return (pokerDiceHand::Index("A")+1);
    }
 
+}
+
+
+function eq(pokerDiceHand $lhs, pokerDiceHand $rhs)
+{
+   echo "eq()\n";
+   //var_dump($lhs);
+   //var_dump($rhs);
+   //if (ReferenceEquals(lhs, null) && ReferenceEquals(rhs, null))
+   //   return true;
+   //if (ReferenceEquals(lhs, null))
+   //   return false;
+   //if (ReferenceEquals(rhs, null))
+   //   return false;
+   //if (ReferenceEquals(lhs, rhs))
+   //   return true;
+   //if (lhs.faces == rhs.faces)
+   //   return true;
+   //return false;
+   if(is_null($lhs) && is_null($rhs))
+   {
+      echo "a";
+      return TRUE;
+   }
+   if(is_null($lhs) )
+   {
+      echo "b";
+      return FALSE;
+   }
+   if(is_null($rhs) )
+   {
+      echo "c";
+      return FALSE;
+   }
+   if( $lhs === $rhs )
+   {
+      echo "d";
+      return TRUE;
+   }
+   if( $lhs->$facesString == $rhs->$facesString)
+   {
+      echo "e\n";
+      echo $lhs->$facesString . "\n"; 
+      echo $rhs->$facesString . "\n"; 
+      return TRUE;
+   }
+   return FALSE;
 }
 
 ?>
