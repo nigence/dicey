@@ -134,7 +134,7 @@ namespace ld
 
         public enum HandKind { fiveOfKind, fourOfKind, fullHouse, straight, threeOfKind, twoPairs, pair, none };
 
-        private void countFaces(String fiveFacesString, string faceKind, ref int counterToIncrement)
+        private static void countFaces(String fiveFacesString, string faceKind, ref int counterToIncrement)
         {
             int faceVal = System.Char.ConvertToUtf32(faceKind, 0);
             counterToIncrement = 0;
@@ -221,7 +221,7 @@ namespace ld
             }
         }
 
-        private int FindRepeatedFace(int[] facesCounts,  int frequency, int? excludeA=null, int? excludeB=null )
+        private static int FindRepeatedFace(int[] facesCounts,  int frequency, int? excludeA=null, int? excludeB=null )
         {
             for (int j = FacesCount() - 1; j > -1; j--)
             {

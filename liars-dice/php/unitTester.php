@@ -5,23 +5,24 @@ require_once(__ROOT__.'/pokerDiceHand.php');
 
 function PokerDiceHandEqualityOperatorTestPassed()
 {
+   echo "PokerDiceHandEqualityOperatorTestPassed()\n";
+   $pdha = new pokerDiceHand("AAJJ9");
+
+   //$pdhb = new pokerDiceHand("AJ9AJ");
+
+   //if (pokerDiceHand::ne($pdha, $pdhb))
+   //   return FALSE;
+
+   $pdhc = new pokerDiceHand("AJAAJ");
 
 
-//            pokerDiceHand pdha = new pokerDiceHand("AAJJ9");
+   var_dump( $pdha );
+   var_dump( $pdhc );
 
-
-/*            pokerDiceHand pdhb = new pokerDiceHand("AJ9AJ");
-            if (pdha != pdhb)
-                return false;
-
-            pokerDiceHand pdhc = new pokerDiceHand("AJAAJ");
-            if (pdha == pdhc)
-                return false;
-
-            return true;
-*/
-
-    return FALSE;
+   if (pokerDiceHand::eq($pdha, $pdhc))
+      return FALSE;
+ 
+   return TRUE;
 }
 
 
