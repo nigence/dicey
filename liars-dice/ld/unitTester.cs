@@ -31,6 +31,7 @@ namespace ld
                 if (!GameEngineSampleGameTestPassed()) break;
                 if (!GameEngineStalemateRoundTestPassed()) break;
                 if (!GameNotFoundErrorTestPassed()) break;
+                if (!SetRunningOrderWrongPlayersTestPassed()) break;
                 allOkay = true;
             }
             if (!allOkay)
@@ -1038,6 +1039,90 @@ namespace ld
             response = ge.JoinGame(gameIdentifier, "Bob");
             var pr = response as playerRegistration;
             if (pr.GetAccessToken() != null) return false;
+
+            return true;
+        }
+
+        private bool SetRunningOrderWrongPlayersTestPassed()
+        {
+            var ge = new gameEngine(pdrtm);
+            gameEngineReturnMessage response = ge.CreateNewGame("Alice", 3);
+            var ngd = response as newGameDetails;
+            string gameIdentifier = ngd.GetGameIdentifier();
+
+            var playersAccessTokens = new Dictionary<string, string>();
+            playersAccessTokens.Add("Alice", ngd.GetAccessToken());
+
+            // TWO MORE PLAYERS JOIN
+            response = ge.JoinGame(gameIdentifier, "Bob");
+            var pr = response as playerRegistration;
+            if (pr.GetAccessToken() == null) return false;
+            playersAccessTokens.Add("Bob", pr.GetAccessToken());
+
+            response = ge.JoinGame(gameIdentifier, "Connie");
+            pr = response as playerRegistration;
+            if (pr.GetAccessToken() == null) return false;
+            playersAccessTokens.Add("Connie", pr.GetAccessToken());
+
+
+            // BOB SEES THREE PLAYERS TOTAL
+            response = ge.Poll(playersAccessTokens["Bob"]);
+            var pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.gameName != gameIdentifier) return false;
+            if (pollresponse.playerStatusLines.Count != 3) return false;
+
+            //BOB SEES THAT THE PLAYERS ARE ALICE, BOB, AND CONNIE
+            if (pollresponse.playerStatusLines[0].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
+
+            //BOB SEES THE GAME NAME AND THAT PLAYERS ARE STILL ABLE TO JOIN
+            if (pollresponse.gameName != gameIdentifier) return false;
+            if (pollresponse.status != gameStatus.playersJoining) return false;
+
+            //WRONG PERSON TRIES TO CLOSE THE GAME TO NEW JOINERS
+            string corruptedPlayerToken = playersAccessTokens["Alice"] + "asjbsjii";
+            response = ge.CloseForNewJoiners(corruptedPlayerToken);
+            var br = response as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+            response = ge.CloseForNewJoiners(playersAccessTokens["Connie"]);
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+
+            //DAVE IS TOO LATE TO JOIN THE GAME
+            response = ge.CloseForNewJoiners(playersAccessTokens["Alice"]);
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (!br.okay) return false;
+            response = ge.JoinGame(gameIdentifier, "Dave");
+            pr = response as playerRegistration;
+            if (pr == null) return false;
+            if (pr.GetAccessToken() != null) return false;
+
+            //ALICE(ADMIN) SHUFFLES THE PLAYERS INTO THE RUNNING ORDER
+            //  - But this time there is a name error
+            List<string> runningOrder = new List<string> { "Bxb", "Alice", "Connie" };
+            response = ge.SetPlayersRunningOrder(playersAccessTokens["Alice"], runningOrder);
+            br = response as boolResponse;
+            if (br.okay)
+                return false;
+
+            //TOO FEW PLAYERS IN THE RUNNING ORDER...
+            List<string> wrongRunningOrderToFew = new List<string> { "Bob", "Alice" };
+            response = ge.SetPlayersRunningOrder(playersAccessTokens["Alice"], wrongRunningOrderToFew);
+            br = response as boolResponse;
+            if (br.okay)
+                return false;
+
+            //TOO MANY PLAYERS IN THE RUNNING ORDER...
+            List<string> wrongRunningOrderToMany = new List<string> { "Bob", "Alice", "Connie", "Extra" };
+            response = ge.SetPlayersRunningOrder(playersAccessTokens["Alice"], wrongRunningOrderToMany);
+            br = response as boolResponse;
+            if (br.okay)
+                return false;
 
             return true;
         }
