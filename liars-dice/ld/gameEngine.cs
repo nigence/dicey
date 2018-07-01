@@ -108,20 +108,39 @@ namespace ld
             return returnMessage;
         }
 
-        public void DeclareHand(string accessToken, pokerDiceHand hand)
+        public gameEngineReturnMessage DeclareHand(string accessToken, pokerDiceHand hand)
         {
             game associatedGame = FindGameByPlayer(accessToken);
+            boolResponse returnMsg = new boolResponse();
+
             if (associatedGame == null)
-                return;
-            associatedGame.DeclareHand(accessToken, hand);
+            {
+                returnMsg.okay = false;
+                return returnMsg;
+            }
+
+            bool declareAccepted = associatedGame.DeclareHand(accessToken, hand);
+            if (declareAccepted)
+                returnMsg.okay = true;
+            else
+                returnMsg.okay = false;
+
+            return returnMsg;
         }
 
-        public void AcceptHand(string accessToken)
+        public gameEngineReturnMessage AcceptHand(string accessToken)
         {
+            boolResponse returnMsg = new boolResponse();
             game associatedGame = FindGameByPlayer(accessToken);
             if (associatedGame == null)
-                return;
+            {
+                returnMsg.okay = false;
+                return returnMsg;
+            }
+
             associatedGame.AcceptHand(accessToken);
+            returnMsg.okay = true;
+            return returnMsg;
         }
 
         public void ReRoll(string accessToken, string facesToReRoll)

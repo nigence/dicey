@@ -141,26 +141,29 @@ namespace ld
             return currentActualHand;
         }
 
-        public void DeclareHand(string playerId, pokerDiceHand hand)
+        public bool DeclareHand(string playerId, pokerDiceHand hand)
         {
             player p = null;
             if ((!ConfirmPlayerIsWithActionAwaited(playerId, ref p)) ||
-                (this.status != gameStatus.awaitingPlayerToClaimHandRank)) return;
+                (this.status != gameStatus.awaitingPlayerToClaimHandRank)) return false;
             p.SetHandClaim(hand);
             MoveTurnToNextPlayer();
             status = gameStatus.awaitingPlayerDecisionAcceptOrCallLiar;
+            return true;
         }
 
-        public void AcceptHand(string playerId)
+        public bool AcceptHand(string playerId)
         {
             player p = null;
             if ((!ConfirmPlayerIsWithActionAwaited(playerId, ref p)) ||
-                (this.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar)) return;
+                (this.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar)) return false;
 
             if (StalemateDetected())
                 status = gameStatus.awaitingPlayerToClaimHandRank;
             else
                 status = gameStatus.awaitingPlayerToChooseDiceToReRollOrNone;
+
+            return true;
         }
 
         public void ReRoll(string playerId, string facesToReRoll)

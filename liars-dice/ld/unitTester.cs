@@ -32,6 +32,7 @@ namespace ld
                 if (!GameEngineStalemateRoundTestPassed()) break;
                 if (!GameNotFoundErrorTestPassed()) break;
                 if (!SetRunningOrderWrongPlayersTestPassed()) break;
+                if (!WrongPersonCallingTestPassed()) break;
                 allOkay = true;
             }
             if (!allOkay)
@@ -1123,6 +1124,222 @@ namespace ld
             br = response as boolResponse;
             if (br.okay)
                 return false;
+
+            return true;
+        }
+
+        private bool WrongPersonCallingTestPassed()
+        {
+            var ge = new gameEngine(pdrtm);
+            pdrtm.EnqueueRoll(pokerDieFace.T);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
+            gameEngineReturnMessage response = ge.CreateNewGame("Alice", 3);
+            var ngd = response as newGameDetails;
+            string gameIdentifier = ngd.GetGameIdentifier();
+
+            var playersAccessTokens = new Dictionary<string, string>();
+            playersAccessTokens.Add("Alice", ngd.GetAccessToken());
+
+            // TWO MORE PLAYERS JOIN
+            response = ge.JoinGame(gameIdentifier, "Bob");
+            var pr = response as playerRegistration;
+            if (pr.GetAccessToken() == null) return false;
+            playersAccessTokens.Add("Bob", pr.GetAccessToken());
+
+            response = ge.JoinGame(gameIdentifier, "Connie");
+            pr = response as playerRegistration;
+            if (pr.GetAccessToken() == null) return false;
+            playersAccessTokens.Add("Connie", pr.GetAccessToken());
+
+            // WRONG PLAYER TRIES TO POLL
+            string unrecognisedPlayersAccessToken = playersAccessTokens["Bob"] + "duskkausu";
+            response = ge.Poll(unrecognisedPlayersAccessToken);
+            if (response != null) return false;
+
+
+            //DAVE IS NOT TOO LATE TO JOIN THE GAME
+            response = ge.CloseForNewJoiners(playersAccessTokens["Alice"] + "jajkaks");
+            var br = response as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+            response = ge.JoinGame(gameIdentifier, "Dave");
+            pr = response as playerRegistration;
+            if (pr == null) return false;
+            if (pr.GetAccessToken() == null) return false;
+            playersAccessTokens.Add("Dave", pr.GetAccessToken());
+
+            response = ge.CloseForNewJoiners(playersAccessTokens["Alice"]);
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (!br.okay) return false;
+            response = ge.JoinGame(gameIdentifier, "Egbert");
+            pr = response as playerRegistration;
+            if (pr == null) return false;
+            if (pr.GetAccessToken() != null) return false;
+
+            //WRONG PERSON ATTEMPTS TO SHUFFLE THE PLAYERS RUNNING ORDER
+            List<string> runningOrder = new List<string> { "Bob", "Alice", "Connie", "Dave" };
+            response = ge.SetPlayersRunningOrder(playersAccessTokens["Dave"], runningOrder);
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+            response = ge.SetPlayersRunningOrder(playersAccessTokens["Alice"] + "dkjds", runningOrder);
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+
+            //ALICE(ADMIN) SHUFFLES THE PLAYERS INTO THE RUNNING ORDER
+            response = ge.SetPlayersRunningOrder(playersAccessTokens["Alice"], runningOrder);
+
+            //A WRONG PLAYER TRIES TO SEE THE NEW RUNNING ORDER
+            response = ge.Poll("notarecognisedplayer");
+            if (response != null) return false;
+            response = ge.Poll("");
+            if (response != null) return false;
+
+            //CONNIE SEES THE NEW RUNNING ORDER
+            response = ge.Poll(playersAccessTokens["Connie"]);
+            var pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.playerStatusLines.Count != 4) return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[3].GetName() != "Dave") return false;
+
+            // WRONG PEOPLE TRY TO SET THE GAME GOING
+            response = ge.StartGame(playersAccessTokens["Bob"]);
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+            response = ge.StartGame(playersAccessTokens["Connie"]);
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+            response = ge.StartGame(playersAccessTokens["Dave"]);
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+            response = ge.StartGame("somebodyelse");
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+
+
+            //ALICE (ADMIN) SETS THE GAME GOING
+            //BOB SEES THAT THE GAME IS RUNNING
+            response = ge.StartGame(playersAccessTokens["Alice"]);
+            br = response as boolResponse;
+            if (br == null) return false;
+            if (!br.okay) return false;
+            response = ge.Poll(playersAccessTokens["Bob"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerToClaimHandRank) return false;
+
+            //AND HE SEES THAT THE GAME IS WAITING FOR HIM TO DECLARE A HAND
+            if (pollresponse.awaitingActionFromPlayerName != "Bob") return false;
+
+            //HIS HAND IS AJT99
+            if (!playerHasHand("Bob", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
+
+            // PLAYER TRIES TO DECLARE A HAND OUT OF TURN - I.E. WRONG PLAYER
+            var declareHandResponse = ge.DeclareHand(playersAccessTokens["Connie"], new pokerDiceHand("QJT99"));
+            br = declareHandResponse as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+
+
+            //BOB (PROPER PERSON) DECLARES A LOWER HAND (QJT99  - I.E. NOT LIEING)
+            //CONNIE AND ALICE CAN SEE THAT IT IS ALICE's TURN
+            //SHE MUST DECIDE WHETHER OR NOT TO ACCEPT THE HAND
+            //EVERYONE CAN SEE BOB'S CLAIM FOR THE HAND
+            ge.DeclareHand(playersAccessTokens["Bob"], new pokerDiceHand("QJT99"));
+            response = ge.Poll(playersAccessTokens["Connie"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar) return false;
+            if (pollresponse.awaitingActionFromPlayerName != "Alice") return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[3].GetName() != "Dave") return false;
+            if (pollresponse.playerStatusLines[0].getClaim() != new pokerDiceHand("99TJQ")) return false;
+            if (pollresponse.playerStatusLines[1].getClaim() != null) return false;
+            if (pollresponse.playerStatusLines[2].getClaim() != null) return false;
+            if (pollresponse.playerStatusLines[3].getClaim() != null) return false;
+            response = ge.Poll(playersAccessTokens["Alice"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar) return false;
+            if (pollresponse.awaitingActionFromPlayerName != "Alice") return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[3].GetName() != "Dave") return false;
+            if (pollresponse.playerStatusLines[0].getClaim() != new pokerDiceHand("99TJQ")) return false;
+            if (pollresponse.playerStatusLines[1].getClaim() != null) return false;
+            if (pollresponse.playerStatusLines[2].getClaim() != null) return false;
+            if (pollresponse.playerStatusLines[3].getClaim() != null) return false;
+
+
+            //WRONG PERSON TRIES TO ACCEPT THE HAND
+            var acceptHandResponse = ge.AcceptHand(playersAccessTokens["Alice"]);
+
+
+
+            //CONNIE DECIDES TO ACCEPT THE HAND
+            //SHE SEES SHE GOT AJT99
+            //SHE MUST DECIDE HOW MANY TO ROLL AGAIN
+            ge.AcceptHand(playersAccessTokens["Alice"]);
+            if (!playerHasHand("Connie", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
+            if (!playerSeesGameStatus("Connie", gameStatus.awaitingPlayerToChooseDiceToReRollOrNone, "Connie", ge, playersAccessTokens))
+                return false;
+
+            //BOB CANT SEE THE HAND ANYMORE
+            response = ge.Poll(playersAccessTokens["Bob"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.HasHandToView()) return false;
+            if (pollresponse.GetNamedPlayersHand() != null) return false;
+            if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
+
+            // CORRECT PLAYER DECLARES A HAND BUT IT IS TOO LOW
+            //TBD
+
+
+            //CONNIE DECIDES TO REROLL THE JACK AND THE TEN
+            //SHE GETS A JACK AGAIN AND A NINE
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            ge.ReRoll(playersAccessTokens["Connie"], "JT");
+
+
+            //ALICE CAN SEE THAT CONNIE REROLLS 2 DICE
+            //AND THAT CONNIE MUST NOW DECIDE A HAND RANK TO CLAIM
+            response = ge.Poll(playersAccessTokens["Alice"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.GetNamedPlayersHand() != null) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerToClaimHandRank) return false;
+            if (pollresponse.awaitingActionFromPlayerName != "Connie") return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[0].GetRerollDiceCount() != null) return false;
+            if (pollresponse.playerStatusLines[1].GetRerollDiceCount() != 2) return false;
+            if (pollresponse.playerStatusLines[2].GetRerollDiceCount() != null) return false;
+
+            //NEW HAND SEEN BY CONNIE IS AJ999
+            if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("AJ999"), ge, playersAccessTokens)) return false;
+
+            //SHE TRIES TO PASS IT OFF AS Q9999
+            ge.DeclareHand(playersAccessTokens["Connie"], new pokerDiceHand("Q9999"));
+            if (!everyoneCanSeePlayersClaim("Connie", new pokerDiceHand("Q9999"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Alice", ge, playersAccessTokens)) return false;
 
             return true;
         }
