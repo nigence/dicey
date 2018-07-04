@@ -138,17 +138,22 @@ namespace ld
                 return returnMsg;
             }
 
-            associatedGame.AcceptHand(accessToken);
-            returnMsg.okay = true;
+            bool acceptedOk = associatedGame.AcceptHand(accessToken);
+            returnMsg.okay = acceptedOk;
             return returnMsg;
         }
 
-        public void ReRoll(string accessToken, string facesToReRoll)
+        public gameEngineReturnMessage ReRoll(string accessToken, string facesToReRoll)
         {
+            boolResponse returnMsg = new boolResponse();
             game associatedGame = FindGameByPlayer(accessToken);
             if (associatedGame == null)
-                return;
-            associatedGame.ReRoll(accessToken, facesToReRoll);
+            {
+                returnMsg.okay = false;
+                return returnMsg;
+            }
+            returnMsg.okay = associatedGame.ReRoll(accessToken, facesToReRoll);
+            return returnMsg;
         }
 
         public void CallLiar(string accessToken)

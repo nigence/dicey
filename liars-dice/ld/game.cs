@@ -166,16 +166,20 @@ namespace ld
             return true;
         }
 
-        public void ReRoll(string playerId, string facesToReRoll)
+        public bool ReRoll(string playerId, string facesToReRoll)
         {
             player p = null;
             if ((!ConfirmPlayerIsWithActionAwaited(playerId, ref p)) ||
-                (this.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone)) return;
+                (this.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone))
+            {
+                return false;
+            }
             status = gameStatus.awaitingPlayerToClaimHandRank;
             p.SetRerollCount(facesToReRoll.Length);
 
             pokerDiceHand newHand = reroller.Reroll(currentActualHand, facesToReRoll);
             currentActualHand = newHand;
+            return true;
         }
 
         public void CallLiar(string accessToken)

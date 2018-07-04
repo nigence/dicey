@@ -33,6 +33,9 @@ namespace ld
                 if (!GameNotFoundErrorTestPassed()) break;
                 if (!SetRunningOrderWrongPlayersTestPassed()) break;
                 if (!WrongPersonCallingTestPassed()) break;
+                if (!playerDeclaresTooLowHandTestPassed()) break;
+                if (!playerActionsOutOfSequenceTestPassed()) break;
+                //TBD choosing not to reroll
                 allOkay = true;
             }
             if (!allOkay)
@@ -1287,16 +1290,22 @@ namespace ld
 
 
             //WRONG PERSON TRIES TO ACCEPT THE HAND
-            var acceptHandResponse = ge.AcceptHand(playersAccessTokens["Alice"]);
+            var acceptHandResponse = ge.AcceptHand(playersAccessTokens["Dave"]);
+            br = acceptHandResponse as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+            acceptHandResponse = ge.AcceptHand("unknownperson");
+            br = acceptHandResponse as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
 
 
-
-            //CONNIE DECIDES TO ACCEPT THE HAND
+            //ALICE DECIDES TO ACCEPT THE HAND
             //SHE SEES SHE GOT AJT99
             //SHE MUST DECIDE HOW MANY TO ROLL AGAIN
             ge.AcceptHand(playersAccessTokens["Alice"]);
-            if (!playerHasHand("Connie", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
-            if (!playerSeesGameStatus("Connie", gameStatus.awaitingPlayerToChooseDiceToReRollOrNone, "Connie", ge, playersAccessTokens))
+            if (!playerHasHand("Alice", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
+            if (!playerSeesGameStatus("Connie", gameStatus.awaitingPlayerToChooseDiceToReRollOrNone, "Alice", ge, playersAccessTokens))
                 return false;
 
             //BOB CANT SEE THE HAND ANYMORE
@@ -1305,44 +1314,118 @@ namespace ld
             if (pollresponse == null) return false;
             if (pollresponse.HasHandToView()) return false;
             if (pollresponse.GetNamedPlayersHand() != null) return false;
-            if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("AJT99"), ge, playersAccessTokens)) return false;
+
+
+            //WRONG PERSON TRIES TO ASK FOR A REROLL ( *NOT* ALICE REROLL THE JACK AND THE TEN
+            //SHE GETS A JACK AGAIN AND A NINE
+            var rerollResponse = ge.ReRoll(playersAccessTokens["Connie"], "JT");
+            br = rerollResponse as boolResponse;
+            if (br == null) return false;
+            if (br.okay) return false;
+
+
+            //DAVE DOES NOT SEE THAT ALICE REROLLED 2 DICE
+            //AND THAT SHE MUST NOW DECIDE A HAND RANK TO CLAIM
+            response = ge.Poll(playersAccessTokens["Dave"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.GetNamedPlayersHand() != null) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerToChooseDiceToReRollOrNone) return false;
+            if (pollresponse.awaitingActionFromPlayerName != "Alice") return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[3].GetName() != "Dave") return false;
+            if (pollresponse.playerStatusLines[0].GetRerollDiceCount() != null) return false;
+            if (pollresponse.playerStatusLines[1].GetRerollDiceCount() == 2) return false;
+            if (pollresponse.playerStatusLines[2].GetRerollDiceCount() != null) return false;
+            if (pollresponse.playerStatusLines[3].GetRerollDiceCount() != null) return false;
+
+
+            // ALICE (PROPER PERSON) REROLLS 2
+            pdrtm.EnqueueRoll(pokerDieFace.J);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            rerollResponse = ge.ReRoll(playersAccessTokens["Alice"], "JT");
+            br = rerollResponse as boolResponse;
+            if (br == null) return false;
+            if (!br.okay) return false;
+
+            response = ge.Poll(playersAccessTokens["Dave"]);
+            pollresponse = response as pollResponse;
+            if (pollresponse == null) return false;
+            if (pollresponse.GetNamedPlayersHand() != null) return false;
+            if (pollresponse.status != gameStatus.awaitingPlayerToClaimHandRank) return false;
+            if (pollresponse.awaitingActionFromPlayerName != "Alice") return false;
+            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
+            if (pollresponse.playerStatusLines[1].GetName() != "Alice") return false;
+            if (pollresponse.playerStatusLines[2].GetName() != "Connie") return false;
+            if (pollresponse.playerStatusLines[3].GetName() != "Dave") return false;
+            if (pollresponse.playerStatusLines[0].GetRerollDiceCount() != null) return false;
+            if (pollresponse.playerStatusLines[1].GetRerollDiceCount() != 2) return false;
+            if (pollresponse.playerStatusLines[2].GetRerollDiceCount() != null) return false;
+            if (pollresponse.playerStatusLines[3].GetRerollDiceCount() != null) return false;
+
+
+            //ALICE DECLARES A HAND
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("AJ999"), ge, playersAccessTokens)) return false;
+            var declResponse = ge.DeclareHand(playersAccessTokens["Alice"], new pokerDiceHand("QQQQQ"));
+            br = declResponse as boolResponse;
+            if (br == null) return false;
+            if (!br.okay) return false;
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("AJ999"), ge, playersAccessTokens)) return false;
+
+
+            //WRONG PERSON TRIES TO CALL LIAR
+            ge.CallLiar(playersAccessTokens["Dave"]);
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Connie", ge, playersAccessTokens)) return false;
+            if (!VerifyAllSeeLivesRemaining("Alice", 3, ge, playersAccessTokens)) return false;
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("AJ999"), ge, playersAccessTokens)) return false;
+
+
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.N);
+            pdrtm.EnqueueRoll(pokerDieFace.Q);
+            pdrtm.EnqueueRoll(pokerDieFace.A);
+            ge.CallLiar(playersAccessTokens["Alice"]);
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Bob", ge, playersAccessTokens)) return false;
+            if (!VerifyAllSeeLivesRemaining("Connie", 0, ge, playersAccessTokens)) return false;
+            if (!playerHasHandOthersCantSee("Bob", new pokerDiceHand("999QA"), ge, playersAccessTokens)) return false;
+
+            return true;
+        }
+
+
+        private bool playerDeclaresTooLowHandTestPassed()
+        {
+            return false;
+            gameEngine ge;
+            Dictionary<string, string> playersAccessTokens;
+            if (!StartOfSampleGameTestPassed(out ge, out playersAccessTokens)) return false;
 
             // CORRECT PLAYER DECLARES A HAND BUT IT IS TOO LOW
             //TBD
 
 
-            //CONNIE DECIDES TO REROLL THE JACK AND THE TEN
-            //SHE GETS A JACK AGAIN AND A NINE
-            pdrtm.EnqueueRoll(pokerDieFace.J);
-            pdrtm.EnqueueRoll(pokerDieFace.N);
-            ge.ReRoll(playersAccessTokens["Connie"], "JT");
+            return true;
+        }
 
 
-            //ALICE CAN SEE THAT CONNIE REROLLS 2 DICE
-            //AND THAT CONNIE MUST NOW DECIDE A HAND RANK TO CLAIM
-            response = ge.Poll(playersAccessTokens["Alice"]);
-            pollresponse = response as pollResponse;
-            if (pollresponse == null) return false;
-            if (pollresponse.GetNamedPlayersHand() != null) return false;
-            if (pollresponse.status != gameStatus.awaitingPlayerToClaimHandRank) return false;
-            if (pollresponse.awaitingActionFromPlayerName != "Connie") return false;
-            if (pollresponse.playerStatusLines[0].GetName() != "Bob") return false;
-            if (pollresponse.playerStatusLines[1].GetName() != "Connie") return false;
-            if (pollresponse.playerStatusLines[2].GetName() != "Alice") return false;
-            if (pollresponse.playerStatusLines[0].GetRerollDiceCount() != null) return false;
-            if (pollresponse.playerStatusLines[1].GetRerollDiceCount() != 2) return false;
-            if (pollresponse.playerStatusLines[2].GetRerollDiceCount() != null) return false;
+        private bool playerActionsOutOfSequenceTestPassed()
+        {
+            return false;
+            gameEngine ge;
+            Dictionary<string, string> playersAccessTokens;
+            if (!StartOfSampleGameTestPassed(out ge, out playersAccessTokens)) return false;
 
-            //NEW HAND SEEN BY CONNIE IS AJ999
-            if (!playerHasHandOthersCantSee("Connie", new pokerDiceHand("AJ999"), ge, playersAccessTokens)) return false;
+            // CORRECT PLAYER DECLARES A HAND BUT IT IS TOO LOW
+            //TBD
 
-            //SHE TRIES TO PASS IT OFF AS Q9999
-            ge.DeclareHand(playersAccessTokens["Connie"], new pokerDiceHand("Q9999"));
-            if (!everyoneCanSeePlayersClaim("Connie", new pokerDiceHand("Q9999"), ge, playersAccessTokens)) return false;
-            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Alice", ge, playersAccessTokens)) return false;
 
             return true;
         }
+
     }
 
 }
