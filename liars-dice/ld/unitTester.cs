@@ -35,6 +35,7 @@ namespace ld
                 if (!WrongPersonCallingTestPassed()) break;
                 if (!playerDeclaresTooLowHandTestPassed()) break;
                 if (!playerActionsOutOfSequenceTestPassed()) break;
+                if (!incorrectLiarCallEliminatesPlayerTestPassed()) break;
                 //TBD choosing not to reroll
                 allOkay = true;
             }
@@ -1376,6 +1377,9 @@ namespace ld
             if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("AJ999"), ge, playersAccessTokens)) return false;
 
 
+            //NOW WAITING FOR CONNIE TO DECIDE WHETHER OR NOT TO ACCEPT OR CALL LIAR
+
+
             //WRONG PERSON TRIES TO CALL LIAR
             ge.CallLiar(playersAccessTokens["Dave"]);
             if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Connie", ge, playersAccessTokens)) return false;
@@ -1389,9 +1393,9 @@ namespace ld
             pdrtm.EnqueueRoll(pokerDieFace.Q);
             pdrtm.EnqueueRoll(pokerDieFace.A);
             ge.CallLiar(playersAccessTokens["Alice"]);
-            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerToClaimHandRank, "Bob", ge, playersAccessTokens)) return false;
-            if (!VerifyAllSeeLivesRemaining("Connie", 0, ge, playersAccessTokens)) return false;
-            if (!playerHasHandOthersCantSee("Bob", new pokerDiceHand("999QA"), ge, playersAccessTokens)) return false;
+            if (!allPlayersSeeGameStatus(gameStatus.awaitingPlayerDecisionAcceptOrCallLiar, "Connie", ge, playersAccessTokens)) return false;
+            if (!VerifyAllSeeLivesRemaining("Alice", 3, ge, playersAccessTokens)) return false;
+            if (!playerHasHandOthersCantSee("Alice", new pokerDiceHand("AJ999"), ge, playersAccessTokens)) return false;
 
             return true;
         }
@@ -1424,6 +1428,11 @@ namespace ld
 
 
             return true;
+        }
+
+        private bool incorrectLiarCallEliminatesPlayerTestPassed()
+        {
+            return false;
         }
 
     }

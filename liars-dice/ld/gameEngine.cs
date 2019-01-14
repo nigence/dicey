@@ -93,15 +93,10 @@ namespace ld
                 returnMessage.playerStatusLines.Add(new playerStatusLine(n, livesLeft, handClaimMade ,handClaim, rerollCount));
             }
 
-
             returnMessage.awaitingActionFromPlayerName = associatedGame.GetPlayerNameWithActionAwaited();
 
             //Decide whether or not to reveal actual hand to the calling player
-            if ((associatedGame.GetPlayerById(accessToken).GetName() == associatedGame.GetPlayerNameWithActionAwaited())
-                && 
-                ((associatedGame.GetStatus() == gameStatus.awaitingPlayerToClaimHandRank)
-                ||  (associatedGame.GetStatus() == gameStatus.awaitingPlayerToChooseDiceToReRollOrNone))
-                )
+            if (associatedGame.GetPlayerById(accessToken).GetName() == associatedGame.GetPlayerNameCurrentlyHoldingTheHand()  )
             {
                 returnMessage.SetHandToView(associatedGame.GetActualHand());
             }

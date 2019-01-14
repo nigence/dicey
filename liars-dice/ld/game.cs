@@ -52,6 +52,7 @@ namespace ld
         {
             status = gameStatus.awaitingPlayerToClaimHandRank;
             playerToActIndex = 0;
+            playerOwningTheHandIndex = 0;
         }
 
         public bool hasPlayerId(string Id)
@@ -98,6 +99,11 @@ namespace ld
         {
             player p = playersList[playerToActIndex];
             return p.GetName();
+        }
+
+        public string GetPlayerNameCurrentlyHoldingTheHand()
+        {
+            return playersList[playerOwningTheHandIndex].GetName();
         }
 
 
@@ -159,9 +165,15 @@ namespace ld
                 (this.status != gameStatus.awaitingPlayerDecisionAcceptOrCallLiar)) return false;
 
             if (StalemateDetected())
+            {
                 status = gameStatus.awaitingPlayerToClaimHandRank;
+                //TBD? Should roll another hand and go again?
+            }
             else
+            {
                 status = gameStatus.awaitingPlayerToChooseDiceToReRollOrNone;
+                SetPlayerWithTurnAsHandOwner(); // i.e We accepted the hand
+            }
 
             return true;
         }
@@ -247,6 +259,7 @@ namespace ld
             else
             {
                 RewindTurnToPreviousPlayer();
+                SetPlayerWithTurnAsHandOwner();
                 currentActualHand = reroller.GetNewHand();
                 status = gameStatus.awaitingPlayerToClaimHandRank;
             }
@@ -263,9 +276,10 @@ namespace ld
             }
             else
             {
+                //TBD what if incorrect liar call eliminates the player?
                 this.status = gameStatus.awaitingPlayerToClaimHandRank;
                 currentActualHand = reroller.GetNewHand();
-                status = gameStatus.awaitingPlayerToClaimHandRank;
+                SetPlayerWithTurnAsHandOwner(); // i.e. move from the non-liar to me but all rerolled
             }
 
 
@@ -283,6 +297,16 @@ namespace ld
         private void MoveTurnToNextPlayer()
         {
             playerToActIndex = GetIndexOfSubsequentPlayer(playerToActIndex);
+        }
+
+        private void MoveHandToNextPlayer()
+        {
+            playerOwningTheHandIndex = GetIndexOfSubsequentPlayer(playerOwningTheHandIndex);
+        }
+
+        private void SetPlayerWithTurnAsHandOwner()
+        {
+            playerOwningTheHandIndex = playerToActIndex;
         }
 
         private int GetIndexOfSubsequentPlayer(int playerIndex, bool ignoreLivesCounts = false)
@@ -361,6 +385,7 @@ namespace ld
         private List<player> playersList; //includes administrator
         private player mAdministrator;
         private int playerToActIndex;
+        private int playerOwningTheHandIndex;
         private pokerDiceHand currentActualHand;
         private pokerDiceHandReroller reroller;
         private int mInitialLivesCount;
